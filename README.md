@@ -1,3 +1,7 @@
+#camii
+
+[![DOI](https://zenodo.org/badge/1245913746.svg)](https://doi.org/10.5281/zenodo.20338644)
+
 camii
 
 camii is a MATLAB function developed based on the theoretical framework presented in Vobig (2025).
