@@ -46,7 +46,7 @@ typeIDs = mapFeatures(options.TypeFeatures, 1:12, featureNames);
 formatNames = ["png", "jpg", "eps", "svg"];
 
 exportFigFormat = mapFormat(options.ExportFormat, ["-png", "-jpg", "-eps", "-svg"], formatNames);
-printFormat = mapFormat(options.ExportFormat, ["-dpng", "-djpg", "-depsc", "-dsvg"], formatNames);
+printFormat = mapFormat(options.ExportFormat, ["-dpng", "-djpeg", "-depsc", "-dsvg"], formatNames);
 
 
 %%
