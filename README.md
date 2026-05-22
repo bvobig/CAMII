@@ -2,8 +2,6 @@
 
 [![DOI](https://zenodo.org/badge/1245913746.svg)](https://doi.org/10.5281/zenodo.20338644)
 
-camii
-
 camii is a MATLAB function developed based on the theoretical framework presented in Vobig (2025).
 The function analyzes dyadic piano improvisations provided as MIDI files containing two channels. It preprocesses the data using a modified version of the Music Therapy Toolbox (MTTB) and applies a supervised machine learning classifier together with a manually defined decision tree to segment and identify interaction types throughout the improvisation.
 The interaction analysis is based on the concepts of Relational Direction and Relational Proximity.
