@@ -1,2 +1,23 @@
 # External dependencies
 external/
+
+# Simulink cache/build
+slprj/
+sccprj/
+codegen/
+*.slxc
+
+# Compiled binaries
+*.mex*
+
+# MATLAB temporary
+*.m~
+*.autosave
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE/editor
+.vscode/
+.idea/
