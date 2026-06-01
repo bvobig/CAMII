@@ -1,4 +1,4 @@
-function statexport (data, stats, s, clno, expformat)
+function exportStatsFn (data, stats, s, clno, expformat)
 
 %% Prepare Data for Plotting and Define Plotting Variables
 

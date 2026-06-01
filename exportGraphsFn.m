@@ -1,4 +1,4 @@
-function graphexport (data, segments, s, clno, expformat1, expformat2)
+function exportGraphsFn (data, segments, s, clno, expformat1, expformat2)
 
 %% Prepare Data for Plotting and Define Plotting Variables
 % rename time

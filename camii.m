@@ -4,21 +4,20 @@ function [results] = camii(midi_file, clno, options)
         midi_file (1,:) string
         clno (1,:) string
 
-        options.GraphExport (1,1) logical = false
-        options.SegExport   (1,1) logical = false
-        options.StatExport  (1,1) logical = false
-        options.TypeExport  (1,1) logical = false
+        options.export_graphs (1,1) logical = false
+        options.export_segments (1,1) logical = false
+        options.export_stats (1,1) logical = false
+        options.export_types (1,1) logical = false
+        options.export_results (1,1) logical = false
 
         options.BufferSize (1,1) double = 25
         options.ExportFormat string{mustBeMember(options.ExportFormat, ["png", "jpg", "eps", "svg"])} = "jpg"
 
-    options.GraphFeatures string{mustBeMember(options.GraphFeatures, ["All","AC","Articulation","Density", "Dissonance","Duration","Majorness", "MeanPitch","MeanVelocity","Minorness", "StandardPitchDeviation","Tempo","Tonality"])} = "All"
-
-    options.SegFeatures string {mustBeMember(options.SegFeatures, ["All","AC","Articulation","Density", "Dissonance","Duration","Majorness", "MeanPitch","MeanVelocity","Minorness", "StandardPitchDeviation","Tempo","Tonality"])} = "All"
-    
-    options.StatFeatures string {mustBeMember(options.StatFeatures, ["All","AC","Articulation","Density", "Dissonance","Duration","Majorness", "MeanPitch","MeanVelocity","Minorness", "StandardPitchDeviation","Tempo","Tonality"])} = "All"
-
-    options.TypeFeatures string {mustBeMember(options.TypeFeatures, ["All","AC","Articulation","Density", "Dissonance","Duration","Majorness", "MeanPitch","MeanVelocity","Minorness", "StandardPitchDeviation","Tempo","Tonality"])} = "All"
+        options.GraphFeatures string{mustBeMember(options.GraphFeatures, ["All","AC","Articulation","Density", "Dissonance","Duration","Majorness", "MeanPitch","MeanVelocity","Minorness", "StandardPitchDeviation","Tempo","Tonality"])} = "All"
+        options.SegFeatures string {mustBeMember(options.SegFeatures, ["All","AC","Articulation","Density", "Dissonance","Duration","Majorness", "MeanPitch","MeanVelocity","Minorness", "StandardPitchDeviation","Tempo","Tonality"])} = "All"   
+        options.StatFeatures string {mustBeMember(options.StatFeatures, ["All","AC","Articulation","Density", "Dissonance","Duration","Majorness", "MeanPitch","MeanVelocity","Minorness", "StandardPitchDeviation","Tempo","Tonality"])} = "All"
+        options.TypeFeatures string {mustBeMember(options.TypeFeatures, ["All","AC","Articulation","Density", "Dissonance","Duration","Majorness", "MeanPitch","MeanVelocity","Minorness", "StandardPitchDeviation","Tempo","Tonality"])} = "All"
+        options.TableFormat string {mustBeMember(options.TableFormat, ["xlsx", "csv"])} = "xlsx"
 
     end
 
@@ -90,11 +89,12 @@ load ("camii_model.mat", "camii_model") % load ML model
 %%
 improdata = mttb_light2(midi_file, 0.1, 6);
 [data, segmentsbv, feats, stats, types, typestotal] = analysis (improdata, camii_model, options); %Analyse Data
-exportResults(data, clno, segmentsbv, feats, stats, types, typestotal, graphIDs, segIDs, statIDs, typeIDs, exportFigFormat, printFormat, options) %Export Data
 
 results.typestotal=typestotal; % Gather Results
 results.types=types;
-results.stats=stats;
+
+exportResults(data, clno, segmentsbv, feats, stats, types, typestotal, graphIDs, segIDs, statIDs, typeIDs, exportFigFormat, printFormat, results, options) %Export Data
+
 % Calculation
 
 function [data, segmentsbv, feats, stats, types, typestotal] = analysis (mttbdata, model, options) %typestruct
@@ -114,26 +114,30 @@ beep on; beep; disp ("Calculation Task finished");
 end
 % Export
 
-function exportResults(data, clno, segmentsbv, feats, stats, types, typestotal, graphIDs, segIDs, statIDs, typeIDs, exportFigFormat, printFormat, options)
+function exportResults(data, clno, segmentsbv, feats, stats, types, typestotal, graphIDs, segIDs, statIDs, typeIDs, exportFigFormat, printFormat, results, options)
 
-    if options.GraphExport
-        graphexport(data, segmentsbv, graphIDs, clno, exportFigFormat, printFormat);
+    if options.export_graphs
+        exportGraphsFn(data, segmentsbv, graphIDs, clno, exportFigFormat, printFormat);
         disp("Graph Export finished")
     end
 
-    if options.SegExport
-        segexport(data, segmentsbv, feats, segIDs, clno, exportFigFormat);
+    if options.export_segments
+        exportSegsFn(data, segmentsbv, feats, segIDs, clno, exportFigFormat);
         disp("Segments Export finished")
     end
 
-    if options.StatExport
-        statexport(data, stats, statIDs, clno, exportFigFormat);
+    if options.export_stats
+        exportStatsFn(data, stats, statIDs, clno, exportFigFormat);
         disp("Stat Export finished")
     end
 
-    if options.TypeExport
-        typeexport(data, types, typestotal, typeIDs, clno, printFormat);
+    if options.export_types
+        exportTypesFn(data, types, typestotal, typeIDs, clno, printFormat);
         disp("Interaction Type Export finished")
+    end
+
+    if options.export_results
+        exportResultsFn(results, clno, options.TableFormat);
     end
 
     beep on; beep; 

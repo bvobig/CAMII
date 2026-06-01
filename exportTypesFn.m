@@ -1,4 +1,4 @@
-function typeexport (data, types, typestotal, s, clno, expformat)
+function exportTypesFn (data, types, typestotal, s, clno, expformat)
 %%
 time=data.impro.Time;
 varnames=["AC", "Articulation", "Density", "Dissonance", "Duration", "Majorness", "MeanPitch", "MeanVelocity", "Minorness", "StandardPitchDeviation", "Tempo", "Tonality"];
