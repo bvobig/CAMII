@@ -1,0 +1,1 @@
+function [res, ac] = mypulsesalience(nmat)dt=0.01;[ac,p] = mypulseac(nmat,dt);%figure(3), plot(ac), hold on[ps,ind]=max(ac);res = [ps,ind-1];  % Indices in ac began at position 1.. (OL, 9.6.07)

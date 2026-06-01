@@ -1,0 +1,1 @@
+function [res, ac] = mypulsesalience_noresonance(nmat,resonance)if nargin<2    resonance = 0;enddt=0.01;[ac,p] = mypulseac(nmat,dt,resonance);%figure(3), plot(ac), hold on[ps,ind]=max(ac);res = [ps,ind-1];  % Indices in ac began at position 1.. (OL, 9.6.07)

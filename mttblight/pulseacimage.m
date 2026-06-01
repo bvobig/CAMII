@@ -1,0 +1,1 @@
+function [pim,per] = pulseacimage(nm,wlen,wstep,dt);% function [pim,p] = pulseacimage(nm,wlen,wstep,dt);MAXLAG = 1.5;per = dt*(1:(1+floor(MAXLAG/dt)))';pim=[];os = onsetsecs(nm); ds = dursecs(nm);for t=0:wstep:(os(end)+ds(end))	n=onsetwindow(nm,t-wlen,t,'sec');	[pac,per] = pulseac(n,dt);	pim=[pim pac];end

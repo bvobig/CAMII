@@ -1,0 +1,1 @@
+function ps = pulsesalience(nmat);% function ps = pulsesalience(nmat);dt=0.01;[ac,p] = pulseac(nmat,dt);[ps,ind]=max(ac);

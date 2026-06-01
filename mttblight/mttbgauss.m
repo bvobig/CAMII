@@ -1,0 +1,1 @@
+function y = mttbgauss(x, mu, var);%function y = gauss(x, mu, var);% MU = center of gaussian% VAR = variance of gaussiany=(1/(var*sqrt(2*pi)))*exp(-((x-mu).*(x-mu))/(2*var*var));

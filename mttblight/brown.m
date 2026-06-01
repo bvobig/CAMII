@@ -1,0 +1,1 @@
+function br = brown(nmat,dt);if isempty(nmat) br=0; return; endos = onsetsec(nmat); os=os-os(1);ds = duraccent(dursec(nmat));vlen = ceil(os(end)/dt)+1;br = zeros(vlen,1);ind = round(os/dt)+1;for k=1:length(ind)	br(ind(k)) = br(ind(k))+ds(k);end

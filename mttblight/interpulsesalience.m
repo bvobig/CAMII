@@ -1,0 +1,1 @@
+function res = interpulsesalience(nmat1,nmat2);dt=0.01;ac1 = mypulseac(nmat1,dt);ac2 = mypulseac(nmat2,dt);ac = ac1.*ac2;%[ac,p] = interpulseac(nmat1,nmat2,dt);[ps,id] = max(ac);res=[ps,id];
