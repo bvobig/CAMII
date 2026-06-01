@@ -1,4 +1,4 @@
-function segexport (data, segments, feats, s, clno, expformat)
+function exportSegsFn (data, segments, feats, s, clno, expformat)
 % plot and export segments based on chosen segmentation and feature calculation
 
 %% Prepare Data for Plotting and Define Plotting Variables
