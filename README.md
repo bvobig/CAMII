@@ -8,7 +8,7 @@ The interaction analysis is based on the concepts of Relational Direction and Re
 
 Optional input arguments allow exporting different graphical and statistical representations in various formats.
 
-# Requirements
+## Requirements
 
 The following software and toolboxes are required:
 MATLAB (developed and tested with MATLAB R2024b)
@@ -16,14 +16,14 @@ Statistics and Machine Learning Toolbox
 Signal Processing Toolbox
 External Dependencies
 
-# External Repositories and Functions needed:
+## External Repositories and Functions needed:
 
 mttblight2: modified version of the Music Therapy Toolbox (MTTB) provided by Olivier Lartillot (is contained in repository)
 miditoolbox: MIDI analysis toolbox by Tuomas Eerola and Petri Toiviainen (https://github.com/miditoolbox/1.1)
 InterX: MATLAB function for curve intersection detection (https://de.mathworks.com/matlabcentral/fileexchange/22441-curve-intersections)
 export_fig: MATLAB figure export utility by Yair Altman (https://github.com/altmany/export_fig/tree/master)
 
-# Installation
+## Installation
 
 CAMII can be used either through the provided MATLAB Project or by manually configuring the MATLAB path.
 
@@ -41,17 +41,17 @@ camii/external/miditoolbox
 camii/external/export_figure
 camii/external/InterX
 
-# Input Requirements
+## Input Requirements
 MIDI file (.mid)
 Exactly two MIDI channels representing the two performers
 
-# Example Usage
+## Example Usage
 results = camii("example.mid","ExampleSession");
 
-# Example with optional exports:
+### Example with optional exports:
 results = camii("example.mid", "ExampleSession", GraphExport=true, ExportFormat="png");
 
-# References
+## References
 
 Erkkilä, J., Lartillot, O., Luck, G., Riikkilä, K., & Toiviainen, P. (2004). Intelligent Music Systems in Music Therapy. Music Therapy Today, 5(5).
 
