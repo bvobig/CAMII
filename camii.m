@@ -21,6 +21,42 @@ function [results] = camii(midi_file, clno, options)
     options.TypeFeatures string {mustBeMember(options.TypeFeatures, ["All","AC","Articulation","Density", "Dissonance","Duration","Majorness", "MeanPitch","MeanVelocity","Minorness", "StandardPitchDeviation","Tempo","Tonality"])} = "All"
 
     end
+
+%%
+
+% Check Dependencies
+
+     if isempty(which('mttb_light2'))
+        error('camii:MissingDependency', ...
+            'Required function mttb_light2.m could not be found on the MATLAB path.')
+    end
+    
+    if isempty(which('InterX'))
+        error('camii:MissingDependency', ...
+            'Required function InterX.m could not be found on the MATLAB path.')
+    end
+    
+    projectRoot = fileparts(mfilename('fullpath'));
+    
+    miditoolboxDir = fullfile(projectRoot,'external','miditoolbox');
+    exportFigDir   = fullfile(projectRoot,'external','export_figure');
+    mttbLightDir   = fullfile(projectRoot,'mttblight');
+    
+    if ~isfolder(miditoolboxDir)
+        error('camii:MissingDependency', ...
+            'Folder external/miditoolbox is missing.')
+    end
+    
+    if ~isfolder(exportFigDir)
+        error('camii:MissingDependency', ...
+            'Folder external/export_figure is missing.')
+    end
+    
+    if ~isfolder(mttbLightDir)
+        error('camii:MissingDependency', ...
+            'Folder mttblight is missing.')
+    end
+
 %%
 % Validate MIDI file
     if ~isfile(midi_file)
