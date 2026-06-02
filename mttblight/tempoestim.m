@@ -1,1 +1,0 @@
-function tem = tempoestim(nmat);% function tem = tempoestim(nmat);if isempty(nmat) tem=0; return; enddt=0.01;[ac,p] = pulseac(nmat,dt);[m,ind]=max(ac);per = p(ind);if ind==1 tem=0; return; endtem = 60/per;
