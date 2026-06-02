@@ -1,1 +1,0 @@
-function pc = pulseclarity(nmat);%function pc = pulseclarity(nmat);dt=0.01;p=conv(brown(nmat,dt),mttbgauss(-0.1:dt:0.1,0,0.02));xp=xcorr(p,p,round(2/dt));xxp=xp((length(xp)+1)/2:end);xxxp=xxp;%pc=entropy(xcorr(p,p,round(2/dt)))/entropy(p);pc=1-entropy(xxxp);
