@@ -104,8 +104,8 @@ function [data, segmentsbv, feats, stats, types, typestotal] = analysis (mttbdat
     feats = featcalc(data, 1, segmentsbv, 1, 0.01); disp("3/7 Feature Calculation finished") % calculate features (data, smoothed, segmentmethod, zerodetection, zerothresh)
     [obsc, obst] = feat2obs (feats); disp("4/7 Observation Transformation finished") % convert features into observations
     [predsc, predst] = applymodel (model, obsc, obst); disp("5/7 Interaction Type Prediction finished") % apply model
-    stats = statscalc (obsc, obst, predsc, predst, data, 1, options.BufferSize); disp("6/7 Stat Calculation finished") % calculate stats %buffer*2 is frame in .1s (default = 25)
-    [types, typestotal] = analyseinteractions(stats, data, 0.2);disp("7/7 Interaction Analysis finished") % partnerthresh (default = 0.2) = percentual difference between a.i and c.i to detect Partner gradient
+    stats = statscalc (obsc, obst, predsc, predst, data, 1, options.BufferSize); disp("1/7 Stat Calculation finished") % calculate stats %buffer*2 is frame in .1s (default = 25)
+    [types, typestotal] = analyseinteractions(stats, data, 0.2);disp("Interaction Analysis finished") % partnerthresh (default = 0.2) = percentual difference between a.i and c.i to detect Partner gradient
 
 beep on; beep; disp ("Calculation Task finished");
 
