@@ -19,7 +19,7 @@ end
 %rearrange table
     typestotalTable.Actor = categorical(typestotalTable.Actor);
     typestotalTable.Feat= categorical(typestotalTable.Feat);
-    writetable(typestotalTable, (clno + "_typesTotal." + TableFormat))
+    writetable(typestotalTable, fullfile(outdir, clno + "_typesTotal." + TableFormat))
 %%
 %extract types evolution as table
 
