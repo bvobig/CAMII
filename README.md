@@ -21,10 +21,13 @@ External Dependencies
 mttblight2: modified version of the Music Therapy Toolbox (MTTB) provided by Olivier Lartillot (is contained in repository)
 
 miditoolbox: MIDI analysis toolbox developed by Tuomas Eerola and Petri Toiviainen (https://github.com/miditoolbox/1.1)
+Toiviainen, P., & Eerola, T. (2016). MIDI Toolbox 1.1. URL: https://github.com/miditoolbox/1.1
 
 InterX: MATLAB function for curve intersection detection (https://de.mathworks.com/matlabcentral/fileexchange/22441-curve-intersections)
+NS. (2025). Curve Intersections [MATLAB]. https://www.mathworks.com/matlabcentral/fileexchange/22441-curve-intersections
 
 export_fig: MATLAB figure export utility by Yair Altman (https://github.com/altmany/export_fig/tree/master)
+Altman, Y., & Woodford, O. J. (2014). Export_fig [MATLAB]. https://github.com/altmany/export_fig/releases/tag/v3.48
 
 ## Installation
 
@@ -32,7 +35,7 @@ CAMII can be used either through the provided MATLAB Project or by manually conf
 
 ### Recommended: MATLAB Project
 
-Open the provided MATLAB Project (`camii.prj`).
+Open the provided MATLAB Project (camii.prj).
 The project automatically configures all required paths and dependencies, if available.
 
 ### Manual Setup
@@ -60,8 +63,10 @@ Vobig, B. (2026). camii: Computaional Assessment of Musical Interaction in clini
 
 ## References
 
-Toiviainen, P., & Eerola, T. (2016). MIDI Toolbox 1.1. URL: https://github.com/miditoolbox/1.1
 
 Erkkilä, J., Lartillot, O., Luck, G., Riikkilä, K., & Toiviainen, P. (2004). Intelligent Music Systems in Music Therapy. Music Therapy Today, 5(5).
 
 Vobig, B. (2025). A Computational Approach to Interaction Type Analysis of Music Therapy Improvisations. Music & Science, 8. https://doi.org/10.1177/20592043251329233
+
+
+This project is licensed under the GNU General Public License v3.0 (GPL-3.0). See LICENSE file for details. This repository includes third-party components with compatible licenses (see below).
