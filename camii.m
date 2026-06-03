@@ -19,9 +19,21 @@ function [results] = camii(midi_file, clno, options)
         options.TypeFeatures string {mustBeMember(options.TypeFeatures, ["All","AC","Articulation","Density", "Dissonance","Duration","Majorness", "MeanPitch","MeanVelocity","Minorness", "StandardPitchDeviation","Tempo","Tonality"])} = "All"
         options.TableFormat string {mustBeMember(options.TableFormat, ["xlsx", "csv"])} = "xlsx"
 
+        options.OutputFolder string = ""
+
     end
 
 %%
+
+outdir = options.OutputFolder;
+
+    if strlength(outdir) == 0
+        outdir=pwd;
+    end
+    
+    if ~exist(outdir, 'dir')
+        mkdir(outdir)
+    end
 
 % Check Dependencies
 
@@ -87,7 +99,7 @@ improdata = mttb_light2(midi_file, 0.1, 6);
 results.typestotal=typestotal; % Gather Results
 results.types=types;
 
-exportResults(data, clno, segmentsbv, feats, stats, types, typestotal, graphIDs, segIDs, statIDs, typeIDs, results, options) %Export Data
+exportResults(data, clno, segmentsbv, feats, stats, types, typestotal, graphIDs, segIDs, statIDs, typeIDs, results, outdir, options) %Export Data
 
 % Calculation
 
@@ -106,30 +118,30 @@ beep on; beep; disp ("Calculation Task finished");
 end
 % Export
 
-function exportResults(data, clno, segmentsbv, feats, stats, types, typestotal, graphIDs, segIDs, statIDs, typeIDs, results, options)
+function exportResults(data, clno, segmentsbv, feats, stats, types, typestotal, graphIDs, segIDs, statIDs, typeIDs, results, outdir, options)
 
     if options.export_graphs
-        exportGraphsFn(data, segmentsbv, graphIDs, clno, options.ExportFormat);
+        exportGraphsFn(data, segmentsbv, graphIDs, clno, options.ExportFormat, outdir);
         disp("Graph Export finished")
     end
 
     if options.export_segments
-        exportSegsFn(data, segmentsbv, feats, segIDs, clno, options.ExportFormat);
+        exportSegsFn(data, segmentsbv, feats, segIDs, clno, options.ExportFormat, outdir);
         disp("Segments Export finished")
     end
 
     if options.export_stats
-        exportStatsFn(data, stats, statIDs, clno, options.ExportFormat);
+        exportStatsFn(data, stats, statIDs, clno, options.ExportFormat, outdir);
         disp("Stat Export finished")
     end
 
     if options.export_types
-        exportTypesFn(data, types, typestotal, typeIDs, clno, options.ExportFormat);
+        exportTypesFn(data, types, typestotal, typeIDs, clno, options.ExportFormat, outdir);
         disp("Interaction Type Export finished")
     end
 
     if options.export_results
-        exportResultsFn(results, clno, options.TableFormat);
+        exportResultsFn(results, clno, options.TableFormat, outdir);
     end
 
     beep on; beep; 

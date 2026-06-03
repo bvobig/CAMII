@@ -1,4 +1,4 @@
-function exportTypesFn (data, types, typestotal, s, clno, expformat)
+function exportTypesFn (data, types, typestotal, s, clno, expformat, outdir)
 
 expformat1 = strcat("-", expformat);
 %%
@@ -142,7 +142,7 @@ switch actor
 end
 end
 
-    exportgraphics(distributionFig, clno + "_iatypes_" + var + "_distribution.png", Resolution=600)
+    exportgraphics(distributionFig, fullfile(outdir, clno + "_iatypes_" + var + "_distribution.png"), Resolution=600)
 
 %Visualise Difference between Client and Therapist
 
@@ -161,7 +161,7 @@ figure (Visible="off")
     title ("Gradient Prevalence Comparison")
     set(gca, fontname="Times New Roman")
 
-    export_fig((clno + "_iatypes_" + (var) + "_comparison"), expformat1, "-r600")
+    export_fig(fullfile(outdir, clno + "_iatypes_" + (var) + "_comparison"), expformat1, "-r600")
 
     %%
 %%Single Visualisations
@@ -244,7 +244,7 @@ switch actor % Add fitting Title and labels
 
 end 
 
-    export_fig((clno + "_iatypes_" + (var) + "_" + actor + "_evolution"), expformat1, "-r600")     
+    export_fig(fullfile(outdir, clno + "_iatypes_" + (var) + "_" + actor + "_evolution"), expformat1, "-r600")     
 
 %Plot whole Feature Percentage
 
@@ -270,7 +270,7 @@ switch actor
         title("Therapist", FontAngle="normal")
 end
 
-    export_fig((clno + "_iatypes_" + (var) + "_" + actor + "_distribution"), expformat1, "-r600")
+    export_fig(fullfile(outdir, clno + "_iatypes_" + (var) + "_" + actor + "_distribution"), expformat1, "-r600")
 
 end
 %%

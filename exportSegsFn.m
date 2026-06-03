@@ -1,4 +1,4 @@
-function exportSegsFn (data, segments, feats, s, clno, expformat)
+function exportSegsFn (data, segments, feats, s, clno, expformat, outdir)
 
 expformat1 = strcat("-", expformat);
 
@@ -137,7 +137,7 @@ plot(feats.(var).time(x), value, Marker=marker, Color=colour, MarkerSize=3, Hand
 
     set(gcf, Color="w")
     set(gca, fontname="Times New Roman")
-    export_fig((clno + "_" + var + "_" + feats.(var).time(i)*10000 + "_" + actor), expformat1, "-r600");
+    export_fig(fullfile(outdir, clno + "_" + var + "_" + feats.(var).time(i)*10000 + "_" + actor), expformat1, "-r600");
 end
 hold off
  
