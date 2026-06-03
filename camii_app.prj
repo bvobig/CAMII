@@ -1,0 +1,281 @@
+<deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
+  <configuration file="E:\camii\camii_app.prj" location="E:\camii" name="camii_app" target="target.ezdeploy.standalone" target-name="Application Compiler">
+    <param.appname>camii_app</param.appname>
+    <param.icon>${PROJECT_ROOT}\camii_app_resources\icon.ico</param.icon>
+    <param.icons>
+      <file>${PROJECT_ROOT}\camii_app_resources\icon_48.png</file>
+      <file>${PROJECT_ROOT}\camii_app_resources\icon_32.png</file>
+      <file>${PROJECT_ROOT}\camii_app_resources\icon_24.png</file>
+      <file>${PROJECT_ROOT}\camii_app_resources\icon_16.png</file>
+    </param.icons>
+    <param.version>0.1</param.version>
+    <param.authnamewatermark>Bastian Vobig</param.authnamewatermark>
+    <param.email>bastian.vobig@hfm-nuernberg,de</param.email>
+    <param.company>Nuremberg University of Music</param.company>
+    <param.summary />
+    <param.description />
+    <param.screenshot>E:\camii_test\icon.png</param.screenshot>
+    <param.guid />
+    <param.installpath.string>\CAMII\</param.installpath.string>
+    <param.installpath.combo>option.installpath.programfiles</param.installpath.combo>
+    <param.logo />
+    <param.install.notes />
+    <param.target.install.notes />
+    <param.intermediate>${PROJECT_ROOT}\camii_app\for_testing</param.intermediate>
+    <param.files.only>${PROJECT_ROOT}\camii_app\for_redistribution_files_only</param.files.only>
+    <param.output>${PROJECT_ROOT}\camii_app\for_redistribution</param.output>
+    <param.logdir>${PROJECT_ROOT}\camii_app</param.logdir>
+    <param.enable.clean.build>false</param.enable.clean.build>
+    <param.user.defined.mcr.options />
+    <param.target.type>subtarget.standalone</param.target.type>
+    <param.support.packages />
+    <param.web.mcr>true</param.web.mcr>
+    <param.package.mcr>false</param.package.mcr>
+    <param.no.mcr>false</param.no.mcr>
+    <param.web.mcr.name>MyAppInstaller_web</param.web.mcr.name>
+    <param.package.mcr.name>MyAppInstaller_mcr</param.package.mcr.name>
+    <param.no.mcr.name>MyAppInstaller_app</param.no.mcr.name>
+    <param.windows.command.prompt>true</param.windows.command.prompt>
+    <param.create.log>false</param.create.log>
+    <param.log.file />
+    <param.native.matlab>false</param.native.matlab>
+    <param.checkbox>false</param.checkbox>
+    <param.example />
+    <param.help.text>Syntax 
+	  -? 
+	 
+ Input Arguments 
+	 -?  print help on how to use the application 
+	 input arguments</param.help.text>
+    <unset>
+      <param.authnamewatermark />
+      <param.email />
+      <param.company />
+      <param.summary />
+      <param.description />
+      <param.guid />
+      <param.installpath.combo />
+      <param.logo />
+      <param.install.notes />
+      <param.target.install.notes />
+      <param.intermediate />
+      <param.files.only />
+      <param.output />
+      <param.logdir />
+      <param.enable.clean.build />
+      <param.user.defined.mcr.options />
+      <param.target.type />
+      <param.support.packages />
+      <param.web.mcr />
+      <param.package.mcr />
+      <param.no.mcr />
+      <param.web.mcr.name />
+      <param.package.mcr.name />
+      <param.no.mcr.name />
+      <param.windows.command.prompt />
+      <param.create.log />
+      <param.log.file />
+      <param.native.matlab />
+      <param.checkbox />
+      <param.example />
+    </unset>
+    <fileset.main>
+      <file>${PROJECT_ROOT}\camii_app.mlapp</file>
+    </fileset.main>
+    <fileset.resources>
+      <file>${PROJECT_ROOT}\external\miditoolbox\ambitus.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\analyzecoll.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\analyzedir.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\boundary.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\channel.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\combcontour.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\complebm.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\compltrans.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\concur.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\Contents.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\createnmat.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\dir2coll.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\dropmidich.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\dropshortnotes.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\dur.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\duraccent.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\durdist1.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\durdist2.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\elim.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\entropy.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\extreme.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\filtercoll.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\getmidich.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\gettempo.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\gradus.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\hz2midi.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\ismonophonic.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\ivdirdist1.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\ivdist1.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\ivdist2.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\ivsizedist1.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\keymode.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\keyname.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\keysom.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\keysomanim.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\kkcc.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\kkkey.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\maxkkcc.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\mchannels.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\mdemo1.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\mdemo2.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\mdemo3.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\mdemo4.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\mdemo5.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\mdemo6.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\mdemo7.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\mdemo8.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\mdlMidiToMStr.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\mdlMStrToNMat.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\melaccent.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\melattraction.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\melcontour.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\meldistance.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\meter.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\meteraccent.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\metrichierarchy.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\midi2hz.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\mididemo.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\mobility.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\movewindow.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\narmour.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\nmat2snd.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\nnotes.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\notedensity.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\notename.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\nPVI.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\onset.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\onsetacorr.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\onsetdist.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\onsetwindow.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\pcdist1.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\pcdist2.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\perchannel.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\pianoroll.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\pitch.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\playsound.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\plotdist.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\plothierarchy.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\plotmelcontour.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\private\distance.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\private\exptimewindow.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\private\ofacorr.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\private\onsetfunc.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\private\onsetmodmeter.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\private\onsetsec.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\private\xcorr.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\quantize.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\readmidi.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\refstat.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\reftune.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\scale.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\segmentgestalt.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\segmentprob.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\settempo.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\setvalues.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\shift.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\tempocurve.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\tessitura.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\tonality.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\transpose2c.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\trim.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\velocity.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\writemidi.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\writeNMatToSmf.m</file>
+      <file>${PROJECT_ROOT}\mttblight\brown.m</file>
+      <file>${PROJECT_ROOT}\mttblight\dissonance3.m</file>
+      <file>${PROJECT_ROOT}\mttblight\intermovewindow.m</file>
+      <file>${PROJECT_ROOT}\mttblight\interpulsesalience.m</file>
+      <file>${PROJECT_ROOT}\mttblight\majorkkcc.m</file>
+      <file>${PROJECT_ROOT}\mttblight\minorkkcc.m</file>
+      <file>${PROJECT_ROOT}\mttblight\mttb_light2.m</file>
+      <file>${PROJECT_ROOT}\mttblight\mttbgauss.m</file>
+      <file>${PROJECT_ROOT}\mttblight\myarticulation.m</file>
+      <file>${PROJECT_ROOT}\mttblight\mymovewindow.m</file>
+      <file>${PROJECT_ROOT}\mttblight\mymovewindow2.m</file>
+      <file>${PROJECT_ROOT}\mttblight\mypulseac.m</file>
+      <file>${PROJECT_ROOT}\mttblight\mypulsesalience.m</file>
+      <file>${PROJECT_ROOT}\mttblight\mypulsesalience_noresonance.m</file>
+      <file>${PROJECT_ROOT}\mttblight\private\dursec.m</file>
+      <file>${PROJECT_ROOT}\mttblight\private\onsetsec.m</file>
+      <file>${PROJECT_ROOT}\mttblight\private\xcorr.m</file>
+      <file>${PROJECT_ROOT}\mttblight\silence.m</file>
+    </fileset.resources>
+    <fileset.package />
+    <fileset.depfun>
+      <file>${PROJECT_ROOT}\analyseinteractions.m</file>
+      <file>${PROJECT_ROOT}\applymodel.m</file>
+      <file>${PROJECT_ROOT}\camii_analysis.m</file>
+      <file>${PROJECT_ROOT}\camii_export.m</file>
+      <file>${PROJECT_ROOT}\camii_model.mat</file>
+      <file>${PROJECT_ROOT}\crossingcalc.m</file>
+      <file>${PROJECT_ROOT}\exportGraphsFn.m</file>
+      <file>${PROJECT_ROOT}\exportResultsFn.m</file>
+      <file>${PROJECT_ROOT}\exportSegsFn.m</file>
+      <file>${PROJECT_ROOT}\exportStatsFn.m</file>
+      <file>${PROJECT_ROOT}\exportTypesFn.m</file>
+      <file>${PROJECT_ROOT}\external\export_figure\copyfig.m</file>
+      <file>${PROJECT_ROOT}\external\export_figure\crop_borders.m</file>
+      <file>${PROJECT_ROOT}\external\export_figure\eps2pdf.m</file>
+      <file>${PROJECT_ROOT}\external\export_figure\export_fig.m</file>
+      <file>${PROJECT_ROOT}\external\export_figure\fix_lines.m</file>
+      <file>${PROJECT_ROOT}\external\export_figure\ghostscript.m</file>
+      <file>${PROJECT_ROOT}\external\export_figure\hyperlink.m</file>
+      <file>${PROJECT_ROOT}\external\export_figure\isolate_axes.m</file>
+      <file>${PROJECT_ROOT}\external\export_figure\pdf2eps.m</file>
+      <file>${PROJECT_ROOT}\external\export_figure\pdftops.m</file>
+      <file>${PROJECT_ROOT}\external\export_figure\print2array.m</file>
+      <file>${PROJECT_ROOT}\external\export_figure\print2eps.m</file>
+      <file>${PROJECT_ROOT}\external\export_figure\read_write_entire_textfile.m</file>
+      <file>${PROJECT_ROOT}\external\export_figure\user_string.m</file>
+      <file>${PROJECT_ROOT}\external\export_figure\using_hg2.m</file>
+      <file>${PROJECT_ROOT}\external\export_figure\xkcdify.m</file>
+      <file>${PROJECT_ROOT}\external\InterX.m</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\finfolktunes.mat</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\keysomdata.mat</file>
+      <file>${PROJECT_ROOT}\external\miditoolbox\markovdata.mat</file>
+      <file>${PROJECT_ROOT}\feat2obs.m</file>
+      <file>${PROJECT_ROOT}\featcalc.m</file>
+      <file>${PROJECT_ROOT}\preproc.m</file>
+      <file>${PROJECT_ROOT}\segmentbv.m</file>
+      <file>${PROJECT_ROOT}\statscalc.m</file>
+    </fileset.depfun>
+    <build-deliverables>
+      <file location="${PROJECT_ROOT}\camii_app\for_testing" name="readme.txt" optional="true">E:\camii\camii_app\for_testing\readme.txt</file>
+      <file location="${PROJECT_ROOT}\camii_app\for_testing" name="camii_app.exe" optional="false">E:\camii\camii_app\for_testing\camii_app.exe</file>
+      <file location="${PROJECT_ROOT}\camii_app\for_testing" name="splash.png" optional="false">E:\camii\camii_app\for_testing\splash.png</file>
+    </build-deliverables>
+    <workflow />
+    <matlab>
+      <root>D:\MATLAB\R2024a</root>
+      <toolboxes>
+        <toolbox name="neuralnetwork" />
+      </toolboxes>
+      <toolbox>
+        <neuralnetwork>
+          <enabled>true</enabled>
+        </neuralnetwork>
+      </toolbox>
+    </matlab>
+    <platform>
+      <unix>false</unix>
+      <mac>false</mac>
+      <windows>true</windows>
+      <win2k>false</win2k>
+      <winxp>false</winxp>
+      <vista>false</vista>
+      <linux>false</linux>
+      <solaris>false</solaris>
+      <osver>10.0</osver>
+      <os32>false</os32>
+      <os64>true</os64>
+      <arch>win64</arch>
+      <matlab>true</matlab>
+    </platform>
+  </configuration>
+</deployment-project>
