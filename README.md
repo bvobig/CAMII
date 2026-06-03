@@ -19,8 +19,11 @@ External Dependencies
 ## External Repositories and Functions needed:
 
 mttblight2: modified version of the Music Therapy Toolbox (MTTB) provided by Olivier Lartillot (is contained in repository)
-miditoolbox: MIDI analysis toolbox by Tuomas Eerola and Petri Toiviainen (https://github.com/miditoolbox/1.1)
+
+miditoolbox: MIDI analysis toolbox developed by Tuomas Eerola and Petri Toiviainen (https://github.com/miditoolbox/1.1)
+
 InterX: MATLAB function for curve intersection detection (https://de.mathworks.com/matlabcentral/fileexchange/22441-curve-intersections)
+
 export_fig: MATLAB figure export utility by Yair Altman (https://github.com/altmany/export_fig/tree/master)
 
 ## Installation
