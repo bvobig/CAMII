@@ -68,7 +68,7 @@ for t=s
     set (gcf, 'position', [10 10 lengthplot heightplot], Color="w")
     set (gca, fontname="Times New Roman")
     
-        export_fig((clno + "_graph_" + varnames((t+1)/2) + "_raw"), expformat1, "-r1000");
+        export_fig((clno + "_graph_" + varnames((t+1)/2) + "_raw"), expformat1, "-r600");
 
 % Plot Smoothed Data
 
@@ -87,7 +87,7 @@ for t=s
     set (gcf, 'position', [10 10 lengthplot heightplot], Color="w")
     set (gca, fontname="Times New Roman")
     
-        export_fig((clno + "_graph_" + varnames((t+1)/2) + "_smoothed"), expformat1, "-r1000");
+        export_fig((clno + "_graph_" + varnames((t+1)/2) + "_smoothed"), expformat1, "-r600");
 
 % Plot Raw and Smoothed Data 
     
@@ -109,7 +109,7 @@ for t=s
     set (gcf, 'position', [10 10 lengthplot heightplot], Color="w")
     set (gca, fontname="Times New Roman")
     
-        export_fig((clno + "_graph_" + varnames((t+1)/2) + "_layered"), expformat1, "-r1000");
+        export_fig((clno + "_graph_" + varnames((t+1)/2) + "_layered"), expformat1, "-r600");
 
 %% Plot Single and Combined Segmentations
 
@@ -131,7 +131,7 @@ for t=s
     set (gcf, 'position', [10 10 lengthplot heightplot], Color="w")
     set (gca, fontname="Times New Roman")
     
-        export_fig((clno + "_graph_" + varnames((t+1)/2) + "_bv_client"), expformat1, "-r1000");
+        export_fig((clno + "_graph_" + varnames((t+1)/2) + "_bv_client"), expformat1, "-r600");
 
 % Client Raw
 
@@ -151,7 +151,7 @@ for t=s
     set (gcf, 'position', [10 10 lengthplot heightplot], Color="w")
     set (gca, fontname="Times New Roman")
     
-        export_fig((clno + "_graph_" + varnames((t+1)/2) + "_bv_client_raw"), expformat1, "-r1000");
+        export_fig((clno + "_graph_" + varnames((t+1)/2) + "_bv_client_raw"), expformat1, "-r600");
 
 % Therapist
 
@@ -172,7 +172,7 @@ for t=s
     set (gcf, 'position', [10 10 lengthplot heightplot], Color="w")
     set (gca, fontname="Times New Roman")
     
-        export_fig((clno + "_graph_" + varnames((t+1)/2) + "_bv_therapist"), expformat1, "-r1000");
+        export_fig((clno + "_graph_" + varnames((t+1)/2) + "_bv_therapist"), expformat1, "-r600");
 
 % Combined
 
@@ -192,7 +192,7 @@ for t=s
     set (gcf, 'position', [10 10 lengthplot heightplot], Color="w")
     set (gca, fontname="Times New Roman")
     
-        export_fig((clno + "_graph_" + varnames((t+1)/2) + "_bv_both"), expformat1, "-r1000");
+        export_fig((clno + "_graph_" + varnames((t+1)/2) + "_bv_both"), expformat1, "-r600");
 
 % Crossings
 
@@ -214,7 +214,7 @@ for t=s
     set (gcf, 'position', [10 10 lengthplot heightplot], Color="w")
     set (gca, fontname="Times New Roman")
     
-        export_fig((clno + "_graph_" + varnames((t+1)/2) + "_crossings"), expformat1, "-r1000");
+        export_fig((clno + "_graph_" + varnames((t+1)/2) + "_crossings"), expformat1, "-r600");
 
 % Everything
 
@@ -236,7 +236,7 @@ for t=s
     set (gcf, 'position', [10 10 lengthplot heightplot], Color="w")
     set (gca, fontname="Times New Roman")
     
-       export_fig((clno + "_graph_" + varnames((t+1)/2) + "_bv_total"), expformat1, "-r1000");
+       export_fig((clno + "_graph_" + varnames((t+1)/2) + "_bv_total"), expformat1, "-r600");
     
 % Combined Graphics
 
@@ -293,7 +293,7 @@ nexttile ([2 1])
     
     title(tile, "Segmentation Process")
     
-        exportgraphics(segmentation, clno + "_graph_" + varnames((t+1)/2) + "_bv_stacked." + expformat, Resolution=600)        
+        exportgraphics(segmentation, clno + "_graph_" + varnames((t+1)/2) + "_bv_stacked.png", Resolution=600)        
 
 end
 

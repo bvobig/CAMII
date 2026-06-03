@@ -28,7 +28,7 @@ for feat=s
 %%
 %%Combined Figure
 
-t = tiledlayout(2, 3, "TileSpacing","tight");
+distributionFig = tiledlayout(2, 3, "TileSpacing","tight");
 
 % Actor Loop
 
@@ -142,7 +142,7 @@ switch actor
 end
 end
 
-    exportgraphics(gca, clno + "_iatypes_" + var + "_distribution." + extractAfter(expformat1, "-"), Resolution=600)
+    exportgraphics(distributionFig, clno + "_iatypes_" + var + "_distribution.png", Resolution=600)
 
 %Visualise Difference between Client and Therapist
 
@@ -161,7 +161,7 @@ figure (Visible="off")
     title ("Gradient Prevalence Comparison")
     set(gca, fontname="Times New Roman")
 
-    exportgraphics(gca, clno + "_iatypes_" + (var) + "_comparison." + extractAfter(expformat1, "-"), Resolution=600)
+    export_fig((clno + "_iatypes_" + (var) + "_comparison"), expformat1, "-r600")
 
     %%
 %%Single Visualisations
@@ -244,7 +244,7 @@ switch actor % Add fitting Title and labels
 
 end 
 
-        exportgraphics(gca, clno + "_iatypes_" + (var) + "_" + actor + "_evolution." + expformat, Resolution=600)
+    export_fig((clno + "_iatypes_" + (var) + "_" + actor + "_evolution"), expformat1, "-r600")     
 
 %Plot whole Feature Percentage
 
@@ -270,7 +270,7 @@ switch actor
         title("Therapist", FontAngle="normal")
 end
 
-    exportgraphics(gca, clno + "_iatypes_" + (var) + "_" + actor + "_distribution." + expformat, Resolution=600)
+    export_fig((clno + "_iatypes_" + (var) + "_" + actor + "_distribution"), expformat1, "-r600")
 
 end
 %%
