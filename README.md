@@ -54,24 +54,9 @@ results = camii("example.mid","ExampleSession");
 ### Example with optional exports:
 results = camii("example.mid", "ExampleSession", GraphExport=true, ExportFormat="png");
 
-##Citation
+## Citation
 
-APA Format
 Vobig, B. (2026). camii: Computaional Assessment of Musical Interaction in clinical Improvisation (Version v0.1.1) [Software]. Zenodo. https://doi.org/10.5281/ZENODO.20338644
-
-BibTeX Format
-@misc{vobigCamiiComputaionalAssessment2026,
-  title = {Camii: {{Computaional Assessment}} of {{Musical Interaction}} in Clinical {{Improvisation}}},
-  shorttitle = {Camii},
-  author = {Vobig, Bastian},
-  year = 2026,
-  month = may,
-  doi = {10.5281/ZENODO.20338644},
-  urldate = {2026-05-22},
-  copyright = {Creative Commons Attribution 4.0 International},
-  howpublished = {Zenodo}
-}
-
 
 ## References
 
