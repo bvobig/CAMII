@@ -1,4 +1,4 @@
-function exportResultsFn (results, clno, TableFormat)
+function exportResultsFn (results, clno, TableFormat, outdir)
 %%
 actorNames = ["c", "t"];
 %%
@@ -35,6 +35,6 @@ for actoridx = 1:2
     end
 end
 %%
-    writetable(typesEvolution, (clno + "_typesEvolution." + TableFormat))
+    writetable(typesEvolution, fullfile(outdir, clno + "_typesEvolution." + TableFormat))
 %%
 end

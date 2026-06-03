@@ -11,7 +11,7 @@ function [results] = camii(midi_file, clno, options)
         options.export_results (1,1) logical = false
 
         options.BufferSize (1,1) double = 25
-        options.ExportFormat string{mustBeMember(options.ExportFormat, ["png", "jpg", "eps", "svg"])} = "jpg"
+        options.ExportFormat string{mustBeMember(options.ExportFormat, ["png", "jpg", "eps", "svg"])} = "png"
 
         options.GraphFeatures string{mustBeMember(options.GraphFeatures, ["All","AC","Articulation","Density", "Dissonance","Duration","Majorness", "MeanPitch","MeanVelocity","Minorness", "StandardPitchDeviation","Tempo","Tonality"])} = "All"
         options.SegFeatures string {mustBeMember(options.SegFeatures, ["All","AC","Articulation","Density", "Dissonance","Duration","Majorness", "MeanPitch","MeanVelocity","Minorness", "StandardPitchDeviation","Tempo","Tonality"])} = "All"   
@@ -19,9 +19,21 @@ function [results] = camii(midi_file, clno, options)
         options.TypeFeatures string {mustBeMember(options.TypeFeatures, ["All","AC","Articulation","Density", "Dissonance","Duration","Majorness", "MeanPitch","MeanVelocity","Minorness", "StandardPitchDeviation","Tempo","Tonality"])} = "All"
         options.TableFormat string {mustBeMember(options.TableFormat, ["xlsx", "csv"])} = "xlsx"
 
+        options.OutputFolder string = ""
+
     end
 
 %%
+
+outdir = options.OutputFolder;
+
+    if strlength(outdir) == 0
+        outdir=pwd;
+    end
+    
+    if ~exist(outdir, 'dir')
+        mkdir(outdir)
+    end
 
 % Check Dependencies
 
@@ -78,12 +90,6 @@ segIDs = mapFeatures(options.SegFeatures, [1 3 5 7 9 11 13 15 17 19 21 23], feat
 statIDs = mapFeatures(options.StatFeatures, 1:12, featureNames);
 typeIDs = mapFeatures(options.TypeFeatures, 1:12, featureNames);
 
-formatNames = ["png", "jpg", "eps", "svg"];
-
-exportFigFormat = mapFormat(options.ExportFormat, ["-png", "-jpg", "-eps", "-svg"], formatNames);
-printFormat = mapFormat(options.ExportFormat, ["-dpng", "-djpeg", "-depsc", "-dsvg"], formatNames);
-
-
 %%
 load ("camii_model.mat", "camii_model") % load ML model
 %%
@@ -93,7 +99,7 @@ improdata = mttb_light2(midi_file, 0.1, 6);
 results.typestotal=typestotal; % Gather Results
 results.types=types;
 
-exportResults(data, clno, segmentsbv, feats, stats, types, typestotal, graphIDs, segIDs, statIDs, typeIDs, exportFigFormat, printFormat, results, options) %Export Data
+exportResults(data, clno, segmentsbv, feats, stats, types, typestotal, graphIDs, segIDs, statIDs, typeIDs, results, outdir, options) %Export Data
 
 % Calculation
 
@@ -112,30 +118,30 @@ beep on; beep; disp ("Calculation Task finished");
 end
 % Export
 
-function exportResults(data, clno, segmentsbv, feats, stats, types, typestotal, graphIDs, segIDs, statIDs, typeIDs, exportFigFormat, printFormat, results, options)
+function exportResults(data, clno, segmentsbv, feats, stats, types, typestotal, graphIDs, segIDs, statIDs, typeIDs, results, outdir, options)
 
     if options.export_graphs
-        exportGraphsFn(data, segmentsbv, graphIDs, clno, exportFigFormat, printFormat);
+        exportGraphsFn(data, segmentsbv, graphIDs, clno, options.ExportFormat, outdir);
         disp("Graph Export finished")
     end
 
     if options.export_segments
-        exportSegsFn(data, segmentsbv, feats, segIDs, clno, exportFigFormat);
+        exportSegsFn(data, segmentsbv, feats, segIDs, clno, options.ExportFormat, outdir);
         disp("Segments Export finished")
     end
 
     if options.export_stats
-        exportStatsFn(data, stats, statIDs, clno, exportFigFormat);
+        exportStatsFn(data, stats, statIDs, clno, options.ExportFormat, outdir);
         disp("Stat Export finished")
     end
 
     if options.export_types
-        exportTypesFn(data, types, typestotal, typeIDs, clno, printFormat);
+        exportTypesFn(data, types, typestotal, typeIDs, clno, options.ExportFormat, outdir);
         disp("Interaction Type Export finished")
     end
 
     if options.export_results
-        exportResultsFn(results, clno, options.TableFormat);
+        exportResultsFn(results, clno, options.TableFormat, outdir);
     end
 
     beep on; beep; 
@@ -160,15 +166,6 @@ function ids = mapFeatures(features, values, names)
         end
         ids(k) = values(idx);    
     end
-end
-
-function format = mapFormat(formatInput, values, names)
-    idx = strcmpi(formatInput, names);
-        if ~any(idx)
-            error("Unknown Export Format: %s", formatInput)
-        end
-    format = values(idx);
-    
 end
 
 end
