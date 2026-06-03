@@ -1,4 +1,6 @@
 function exportTypesFn (data, types, typestotal, s, clno, expformat)
+
+expformat1 = strcat("-", expformat);
 %%
 time=data.impro.Time;
 varnames=["AC", "Articulation", "Density", "Dissonance", "Duration", "Majorness", "MeanPitch", "MeanVelocity", "Minorness", "StandardPitchDeviation", "Tempo", "Tonality"];
@@ -140,13 +142,13 @@ switch actor
 end
 end
 
-    print((clno + "_iatypes_" + var + "_distribution"), expformat, "-r1200")
+    exportgraphics(gca, clno + "_iatypes_" + var + "_distribution." + extractAfter(expformat1, "-"), Resolution=600)
 
 %Visualise Difference between Client and Therapist
 
 typesdiff=typestotal.c.(var)-typestotal.t.(var); % positive values - client direction, negative values, therapist direction
 
-figure
+figure (Visible="off")
     bar(1:7, typesdiff{1, :}, FaceColor="flat", CData=colorpalette, FaceAlpha=0.1);
     xticklabels(iatypenames)
     ylabel("Difference in Decimal Percentage")
@@ -159,14 +161,15 @@ figure
     title ("Gradient Prevalence Comparison")
     set(gca, fontname="Times New Roman")
 
-    print((clno + "_iatypes_" + (var) + "_comparison"), expformat, "-r600");
-%%
+    exportgraphics(gca, clno + "_iatypes_" + (var) + "_comparison." + extractAfter(expformat1, "-"), Resolution=600)
+
+    %%
 %%Single Visualisations
 
 for actoridx=1:2
     actor=ct(actoridx);
 
-figure
+figure (Visible="off")
     if actor =="c"
     plot(time, c, "g-", DisplayName="Client"); % plot smoothed data above each other
     hold on 
@@ -241,11 +244,11 @@ switch actor % Add fitting Title and labels
 
 end 
 
-        print((clno + "_iatypes_" + (var) + "_" + actor + "_evolution"), expformat, "-r600");
+        exportgraphics(gca, clno + "_iatypes_" + (var) + "_" + actor + "_evolution." + expformat, Resolution=600)
 
 %Plot whole Feature Percentage
 
-figure
+figure (Visible="off")
     statbar=bar(1:7, typestotal.(actor).(var){1, :}, FaceColor="flat", CData=colorpalette, FaceAlpha=0.1);
     fontname("Times New Roman")
     ylabel("Decimal Percentage", FontAngle="normal")
@@ -267,7 +270,8 @@ switch actor
         title("Therapist", FontAngle="normal")
 end
 
-     print((clno + "_iatypes_" + (var) + "_" + actor + "_distribution"), expformat, "-r600");
+    exportgraphics(gca, clno + "_iatypes_" + (var) + "_" + actor + "_distribution." + expformat, Resolution=600)
+
 end
 %%
 end

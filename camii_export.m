@@ -10,7 +10,6 @@ function camii_export(result_struct, clno, options)
         options.export_types (1,1) logical = false
         options.export_results (1,1) logical = false
 
-        options.BufferSize (1,1) double = 25
         options.ExportFormat string{mustBeMember(options.ExportFormat, ["png", "jpg", "eps", "svg"])} = "jpg"
 
         options.GraphFeatures string{mustBeMember(options.GraphFeatures, ["All","AC","Articulation","Density", "Dissonance","Duration","Majorness", "MeanPitch","MeanVelocity","Minorness", "StandardPitchDeviation","Tempo","Tonality"])} = "All"
@@ -30,36 +29,31 @@ segIDs = mapFeatures(options.SegFeatures, [1 3 5 7 9 11 13 15 17 19 21 23], feat
 statIDs = mapFeatures(options.StatFeatures, 1:12, featureNames);
 typeIDs = mapFeatures(options.TypeFeatures, 1:12, featureNames);
 
-formatNames = ["png", "jpg", "eps", "svg"];
-
-exportFigFormat = mapFormat(options.ExportFormat, ["-png", "-jpg", "-eps", "-svg"], formatNames);
-printFormat = mapFormat(options.ExportFormat, ["-dpng", "-djpeg", "-depsc", "-dsvg"], formatNames);
-
 %%
 
-exportResults(clno, graphIDs, segIDs, statIDs, typeIDs, exportFigFormat, printFormat, result_struct, options) %Export Data
+exportResults(clno, graphIDs, segIDs, statIDs, typeIDs, result_struct, options) %Export Data
 
 % Export
 
-function exportResults(clno, graphIDs, segIDs, statIDs, typeIDs, exportFigFormat, printFormat, result_struct, options)
+function exportResults(clno, graphIDs, segIDs, statIDs, typeIDs, result_struct, options)
 
     if options.export_graphs
-        exportGraphsFn(result_struct.data, result_struct.segmentsbv, graphIDs, clno, exportFigFormat, printFormat);
+        exportGraphsFn(result_struct.data, result_struct.segmentsbv, graphIDs, clno, options.ExportFormat);
         disp("Graph Export finished")
     end
 
     if options.export_segments
-        exportSegsFn(result_struct.data, result_struct.segmentsbv, result_struct.feats, segIDs, clno, exportFigFormat);
+        exportSegsFn(result_struct.data, result_struct.segmentsbv, result_struct.feats, segIDs, clno, options.ExportFormat);
         disp("Segments Export finished")
     end
 
     if options.export_stats
-        exportStatsFn(result_struct.data, result_struct.stats, statIDs, clno, exportFigFormat);
+        exportStatsFn(result_struct.data, result_struct.stats, statIDs, clno, options.ExportFormat);
         disp("Stat Export finished")
     end
 
     if options.export_types
-        exportTypesFn(result_struct.data, result_struct.types, result_struct.typestotal, typeIDs, clno, printFormat);
+        exportTypesFn(result_struct.data, result_struct.types, result_struct.typestotal, typeIDs, clno, options.ExportFormat);
         disp("Interaction Type Export finished")
     end
 
@@ -89,15 +83,6 @@ function ids = mapFeatures(features, values, names)
         end
         ids(k) = values(idx);    
     end
-end
-
-function format = mapFormat(formatInput, values, names)
-    idx = strcmpi(formatInput, names);
-        if ~any(idx)
-            error("Unknown Export Format: %s", formatInput)
-        end
-    format = values(idx);
-    
 end
 
 end

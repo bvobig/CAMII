@@ -1,4 +1,7 @@
 function exportSegsFn (data, segments, feats, s, clno, expformat)
+
+expformat1 = strcat("-", expformat);
+
 % plot and export segments based on chosen segmentation and feature calculation
 
 %% Prepare Data for Plotting and Define Plotting Variables
@@ -134,7 +137,7 @@ plot(feats.(var).time(x), value, Marker=marker, Color=colour, MarkerSize=3, Hand
 
     set(gcf, Color="w")
     set(gca, fontname="Times New Roman")
-    export_fig((clno + "_" + var + "_" + feats.(var).time(i)*10000 + "_" + actor), expformat, "-r600");
+    export_fig((clno + "_" + var + "_" + feats.(var).time(i)*10000 + "_" + actor), expformat1, "-r600");
 end
 hold off
  

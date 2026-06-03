@@ -1,4 +1,6 @@
-function exportGraphsFn (data, segments, s, clno, expformat1, expformat2)
+function exportGraphsFn (data, segments, s, clno, expformat)
+
+expformat1=strcat("-",expformat);
 
 %% Prepare Data for Plotting and Define Plotting Variables
 % rename time
@@ -238,7 +240,7 @@ for t=s
     
 % Combined Graphics
 
-figure (Position=[1 1 lengthplot heightplot/2*3], Visible="off")
+segmentation = figure (Position=[1 1 lengthplot heightplot/2*3], Visible="off");
 tile=tiledlayout(5, 2, TileSpacing="compact", Padding="compact");
 
 nexttile ([2 1])
@@ -291,8 +293,7 @@ nexttile ([2 1])
     
     title(tile, "Segmentation Process")
     
-        print((clno + "_graph_" + varnames((t+1)/2) + "_bv_stacked"),expformat2, "-r1000")
-
+        exportgraphics(segmentation, clno + "_graph_" + varnames((t+1)/2) + "_bv_stacked." + expformat, Resolution=600)        
 
 end
 

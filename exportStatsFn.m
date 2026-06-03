@@ -1,5 +1,7 @@
 function exportStatsFn (data, stats, s, clno, expformat)
 
+expformat1=strcat("-", expformat);
+
 %% Prepare Data for Plotting and Define Plotting Variables
 
 varnames=["AC", "Articulation", "Density", "Dissonance", "Duration", "Majorness", "MeanPitch", "MeanVelocity", "Minorness", "StandardPitchDeviation", "Tempo", "Tonality"];
@@ -49,7 +51,7 @@ figure (Visible="off") % Level 1
     ylabel("Decimal Percentage")
     title("Action Type Evolution - Level 1 " + "(" + CT(actoridx) + ")")
         set (gca, fontname="Times New Roman")
-        export_fig((clno + "_stats_" + var + "_" + CT(actoridx) + "_total_lvl1"), expformat, "-r1000");
+        export_fig((clno + "_stats_" + var + "_" + CT(actoridx) + "_total_lvl1"), expformat1, "-r1000");
 
 figure (Visible="off") % Level 2
     plot(data.impro.Time, stats.(act).(var).percenttable2{:, :})
@@ -62,7 +64,7 @@ figure (Visible="off") % Level 2
     ylabel("Decimal Percentage")
     title("Action Type Evolution - Level 2 " + "(" + CT(actoridx) + ")")
         set (gca, fontname="Times New Roman")
-        export_fig((clno + "_stats_" + var + "_" + CT(actoridx) + "_total_lvl2"), expformat, "-r1000");
+        export_fig((clno + "_stats_" + var + "_" + CT(actoridx) + "_total_lvl2"), expformat1, "-r1000");
 
 figure (Visible="off") % Level 3
     plot(data.impro.Time, stats.(act).(var).percenttable3{:, :})
@@ -74,7 +76,7 @@ figure (Visible="off") % Level 3
     ylabel("Decimal Percentage")
     title("Action Type Evolution - Level 3 " + "(" + CT(actoridx) + ")")
         set (gca, fontname="Times New Roman")
-        export_fig((clno + "_stats_" + var + "_" + CT(actoridx) + "_total_lvl3"), expformat, "-r1000");
+        export_fig((clno + "_stats_" + var + "_" + CT(actoridx) + "_total_lvl3"), expformat1, "-r1000");
 
 % Separated Graphs
 
@@ -89,7 +91,7 @@ figure (Visible="off") % Affirmative
     ylabel("Decimal Percentage")
     title("Affirmative Action Type Evolution - I and II " + "(" + CT(actoridx) + ")")
         set (gca, fontname="Times New Roman")
-        export_fig((clno + "_stats_" + var + "_" + CT(actoridx) + "_single_Affirmative_lvl2"), expformat, "-r1000");
+        export_fig((clno + "_stats_" + var + "_" + CT(actoridx) + "_single_Affirmative_lvl2"), expformat1, "-r1000");
 
 figure (Visible="off") % Contradictive
     plot(data.impro.Time, stats.(act).(var).percenttable2{:,5}, Color=[0 0.4470 0.7410], DisplayName="C.I")
@@ -103,7 +105,7 @@ figure (Visible="off") % Contradictive
     ylabel("Decimal Percentage")
     title("Contradictive Action Type Evolution - I and II " + "(" + CT(actoridx) + ")")
         set (gca, fontname="Times New Roman")
-        export_fig((clno + "_stats_" + var + "_" + CT(actoridx) + "_single_Contradictive_lvl2"), expformat, "-r1000");
+        export_fig((clno + "_stats_" + var + "_" + CT(actoridx) + "_single_Contradictive_lvl2"), expformat1, "-r1000");
 
 figure (Visible="off") % Neutral
     plot(data.impro.Time, stats.(act).(var).percenttable2{:,3}, Color=[0 0 0], DisplayName="N.I")
@@ -117,7 +119,7 @@ figure (Visible="off") % Neutral
     ylabel("Decimal Percentage")
     title("Neutral Action Type Evolution - I and II " + "(" + CT(actoridx) + ")")
         set (gca, fontname="Times New Roman")
-        export_fig((clno + "_stats_" + var + "_" + CT(actoridx) + "_single_Neutral_lvl2"), expformat, "-r1000");
+        export_fig((clno + "_stats_" + var + "_" + CT(actoridx) + "_single_Neutral_lvl2"), expformat1, "-r1000");
 
 % Total Action Type Distribution
 
@@ -150,7 +152,7 @@ figure (Visible="off")
     xlabel("Types")
         set (gca, fontname="Times New Roman")
         set (gcf, Color="w")
-        export_fig((clno + "_stats_" + var + "_" + CT(actoridx) + "_global"), expformat, "-r1000");
+        export_fig((clno + "_stats_" + var + "_" + CT(actoridx) + "_global"), expformat1, "-r1000");
 
 end
 end
