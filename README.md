@@ -21,7 +21,7 @@ External Dependencies
 mttblight2: modified version of the Music Therapy Toolbox (MTTB) provided by Olivier Lartillot (is contained in repository)
 
 miditoolbox: MIDI analysis toolbox developed by Tuomas Eerola and Petri Toiviainen (https://github.com/miditoolbox/1.1)
-Toiviainen, P., & Eerola, T. (2016). MIDI Toolbox 1.1. URL: https://github.com/miditoolbox/1.1
+Toiviainen, P., & Eerola, T. (2016). MIDI Toolbox (Version 1.1) [MATLAB]. https://github.com/miditoolbox/1.1
 
 InterX: MATLAB function for curve intersection detection (https://de.mathworks.com/matlabcentral/fileexchange/22441-curve-intersections)
 NS. (2025). Curve Intersections [MATLAB]. https://www.mathworks.com/matlabcentral/fileexchange/22441-curve-intersections

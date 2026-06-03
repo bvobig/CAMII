@@ -14,7 +14,7 @@
     <param.company>Nuremberg University of Music</param.company>
     <param.summary />
     <param.description />
-    <param.screenshot>E:\camii_test\icon.png</param.screenshot>
+    <param.screenshot />
     <param.guid />
     <param.installpath.string>\CAMII\</param.installpath.string>
     <param.installpath.combo>option.installpath.programfiles</param.installpath.combo>
@@ -53,6 +53,7 @@
       <param.company />
       <param.summary />
       <param.description />
+      <param.screenshot />
       <param.guid />
       <param.installpath.combo />
       <param.logo />
