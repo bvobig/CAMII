@@ -115,7 +115,8 @@ https://github.com/miditoolbox/1.1
 
 Reference:
 
-Toiviainen, P., & Eerola, T. (2016). *MIDI Toolbox (Version 1.1) [MATLAB]*.
+Toiviainen, P., & Eerola, T. (2016). MIDI Toolbox 1.1. URL: https://github.com/miditoolbox/1.1
+
 https://github.com/miditoolbox/1.1
 
 ---
@@ -130,7 +131,8 @@ https://www.mathworks.com/matlabcentral/fileexchange/22441-curve-intersections
 
 Reference:
 
-NS. (2025). *Curve Intersections [MATLAB]*.
+NS (2026). Curve intersections (https://ch.mathworks.com/matlabcentral/fileexchange/22441-curve-intersections), MATLAB Central File Exchange. Retrieved June 5, 2026.
+
 https://www.mathworks.com/matlabcentral/fileexchange/22441-curve-intersections
 
 ---
@@ -145,7 +147,8 @@ https://github.com/altmany/export_fig
 
 Reference:
 
-Altman, Y., & Woodford, O. J. (2014). *export_fig [MATLAB]*.
+Yair Altman (2026). export_fig (https://github.com/altmany/export_fig/releases/tag/v3.55), GitHub. Retrieved June 5, 2026.
+
 https://github.com/altmany/export_fig/releases/tag/v3.48
 
 ---
@@ -343,7 +346,22 @@ If you use CAMII in research, please cite:
 
 This project is licensed under the GNU General Public License v3.0 (GPL-3.0).
 
-See the LICENSE file for details.
+> CAMII: A tool for the Computational Assessment of Musical Interaction in clinical Improvisations
+> Copyright (C) <2026>  <Bastian Vobig> 
+> This program is free software: you can redistribute it and/or modify
+> it under the terms of the GNU General Public License as published by
+> the Free Software Foundation, either version 3 of the License, or
+> (at your option) any later version.
+>
+> This program is distributed in the hope that it will be useful,
+> but WITHOUT ANY WARRANTY; without even the implied warranty of
+> MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> GNU General Public License for more details.
+>
+> You should have received a copy of the GNU General Public License
+> along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+See the [LICENSE](LICENSE) file for more details.
 
 The repository also contains third-party components distributed under their respective compatible licenses. Third-party license information is provided in
 [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
