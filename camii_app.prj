@@ -8,10 +8,10 @@
       <file>${PROJECT_ROOT}\camii_app_resources\icon_24.png</file>
       <file>${PROJECT_ROOT}\camii_app_resources\icon_16.png</file>
     </param.icons>
-    <param.version>0.1</param.version>
+    <param.version>0.1.1</param.version>
     <param.authnamewatermark>Bastian Vobig</param.authnamewatermark>
-    <param.email>bastian.vobig@hfm-nuernberg,de</param.email>
-    <param.company>Nuremberg University of Music</param.company>
+    <param.email>bvobig@gmx.de</param.email>
+    <param.company />
     <param.summary />
     <param.description />
     <param.screenshot />
@@ -49,8 +49,6 @@
 	 input arguments</param.help.text>
     <unset>
       <param.authnamewatermark />
-      <param.email />
-      <param.company />
       <param.summary />
       <param.description />
       <param.screenshot />
@@ -220,23 +218,6 @@
       <file>${PROJECT_ROOT}\exportSegsFn.m</file>
       <file>${PROJECT_ROOT}\exportStatsFn.m</file>
       <file>${PROJECT_ROOT}\exportTypesFn.m</file>
-      <file>${PROJECT_ROOT}\external\export_figure\copyfig.m</file>
-      <file>${PROJECT_ROOT}\external\export_figure\crop_borders.m</file>
-      <file>${PROJECT_ROOT}\external\export_figure\eps2pdf.m</file>
-      <file>${PROJECT_ROOT}\external\export_figure\export_fig.m</file>
-      <file>${PROJECT_ROOT}\external\export_figure\fix_lines.m</file>
-      <file>${PROJECT_ROOT}\external\export_figure\ghostscript.m</file>
-      <file>${PROJECT_ROOT}\external\export_figure\hyperlink.m</file>
-      <file>${PROJECT_ROOT}\external\export_figure\isolate_axes.m</file>
-      <file>${PROJECT_ROOT}\external\export_figure\pdf2eps.m</file>
-      <file>${PROJECT_ROOT}\external\export_figure\pdftops.m</file>
-      <file>${PROJECT_ROOT}\external\export_figure\print2array.m</file>
-      <file>${PROJECT_ROOT}\external\export_figure\print2eps.m</file>
-      <file>${PROJECT_ROOT}\external\export_figure\read_write_entire_textfile.m</file>
-      <file>${PROJECT_ROOT}\external\export_figure\user_string.m</file>
-      <file>${PROJECT_ROOT}\external\export_figure\using_hg2.m</file>
-      <file>${PROJECT_ROOT}\external\export_figure\xkcdify.m</file>
-      <file>${PROJECT_ROOT}\external\InterX.m</file>
       <file>${PROJECT_ROOT}\external\miditoolbox\finfolktunes.mat</file>
       <file>${PROJECT_ROOT}\external\miditoolbox\keysomdata.mat</file>
       <file>${PROJECT_ROOT}\external\miditoolbox\markovdata.mat</file>
