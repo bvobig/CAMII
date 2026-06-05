@@ -331,18 +331,6 @@ Optional arguments determine:
 
 ---
 
-# Known Limitations
-
-* Only MIDI files containing exactly two channels are supported.
-* Channel assignment is fixed:
-
-  * Channel 1 = Client
-  * Channel 2 = Therapist
-* The method was developed and validated using piano improvisation recordings.
-* The standalone application is currently available for Windows systems only.
-
----
-
 # Citation
 
 If you use CAMII in research, please cite:
