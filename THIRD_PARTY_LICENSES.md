@@ -97,4 +97,4 @@ CAMII itself is distributed under the terms of the GNU General Public License v3
 
 See the LICENSE file included with this repository for details.
 
-Copyright (c) 2026 Benjamin Vobig.
+Copyright (c) 2026 Bastian Vobig.
