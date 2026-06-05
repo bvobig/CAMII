@@ -99,7 +99,7 @@ camii/
 
 ## mttblight2
 
-Modified version of the Music Therapy Toolbox (MTTB), provided by Olivier Lartillot.
+Modified version of the Music Therapy Toolbox (MTTB), provided by Olivier Lartillot and included with permission for use within CAMII.
 
 Included in this repository.
 
@@ -345,4 +345,5 @@ This project is licensed under the GNU General Public License v3.0 (GPL-3.0).
 
 See the LICENSE file for details.
 
-The repository also contains third-party components distributed under their respective compatible licenses.
+The repository also contains third-party components distributed under their respective compatible licenses. Third-party license information is provided in
+THIRD_PARTY_LICENSES.
