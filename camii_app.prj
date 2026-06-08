@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
-  <configuration build-checksum="1911249492" file="E:\camii\camii_app.prj" location="E:\camii" name="camii_app" preferred-package-location="E:\camii\camii_app\for_redistribution" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
+  <configuration build-checksum="3333195876" file="E:\camii\camii_app.prj" location="E:\camii" name="camii_app" preferred-package-location="E:\camii\camii_app\for_redistribution" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
     <param.appname>CAMII</param.appname>
     <param.icon>${PROJECT_ROOT}\camii_app_resources\icon.ico</param.icon>
     <param.icons>
@@ -8,7 +8,7 @@
       <file>${PROJECT_ROOT}\camii_app_resources\icon_24.png</file>
       <file>${PROJECT_ROOT}\camii_app_resources\icon_16.png</file>
     </param.icons>
-    <param.version>0.1</param.version>
+    <param.version>0.2</param.version>
     <param.authnamewatermark>Bastian Vobig</param.authnamewatermark>
     <param.email>bvobig@gmx.de</param.email>
     <param.company />
@@ -29,8 +29,8 @@
     <param.user.defined.mcr.options />
     <param.target.type>subtarget.standalone</param.target.type>
     <param.support.packages />
-    <param.web.mcr>true</param.web.mcr>
-    <param.package.mcr>false</param.package.mcr>
+    <param.web.mcr>false</param.web.mcr>
+    <param.package.mcr>true</param.package.mcr>
     <param.no.mcr>false</param.no.mcr>
     <param.web.mcr.name>MyAppInstaller_web</param.web.mcr.name>
     <param.package.mcr.name>MyAppInstaller_mcr</param.package.mcr.name>
@@ -68,8 +68,6 @@
       <param.user.defined.mcr.options />
       <param.target.type />
       <param.support.packages />
-      <param.web.mcr />
-      <param.package.mcr />
       <param.no.mcr />
       <param.web.mcr.name />
       <param.package.mcr.name />
@@ -212,6 +210,7 @@
     <fileset.depfun>
       <file>${PROJECT_ROOT}\analyseinteractions.m</file>
       <file>${PROJECT_ROOT}\applymodel.m</file>
+      <file>${PROJECT_ROOT}\arrow.png</file>
       <file>${PROJECT_ROOT}\camii_analysis.m</file>
       <file>${PROJECT_ROOT}\camii_export.m</file>
       <file>${PROJECT_ROOT}\camii_model.mat</file>
