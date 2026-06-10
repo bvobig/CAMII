@@ -2,7 +2,7 @@ function [results] = camii(midi_file, clno, options)
 %%
     arguments
         midi_file (1,:) string
-        clno (1,:) string
+        clno (1,:) string = string(datetime("now", Format = 'yyyyMMdd_HHmmss'));
 
         options.export_graphs (1,1) logical = false
         options.export_segments (1,1) logical = false

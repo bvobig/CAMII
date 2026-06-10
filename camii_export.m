@@ -2,7 +2,7 @@ function camii_export(result_struct, clno, options)
 %%
     arguments
         result_struct (1,:) struct
-        clno (1,:) string
+        clno (1,:) string = string(datetime("now", Format = 'yyyyMMdd_HHmmss'));
 
         options.export_graphs (1,1) logical = false
         options.export_segments (1,1) logical = false
