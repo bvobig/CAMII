@@ -1,8 +1,9 @@
-function camii_export(result_struct, clno, options)
+function camii_export(result_struct, options)
 %%
     arguments
         result_struct (1,:) struct
-        clno (1,:) string = string(datetime("now", Format = 'yyyyMMdd_HHmmss'));
+        
+        options.clno (1,:) string = string(datetime("now", "Format", 'yyyyMMdd_HHmmss'));
 
         options.export_graphs (1,1) logical = false
         options.export_segments (1,1) logical = false
@@ -24,6 +25,10 @@ function camii_export(result_struct, clno, options)
 
 %%
 
+if strlength(options.clno) == 0
+    options.clno = string(datetime("now","Format","yyyyMMdd_HHmmss"));
+end
+
 outdir = options.OutputFolder;
 
     if strlength(outdir) == 0
@@ -43,34 +48,34 @@ typeIDs = mapFeatures(options.TypeFeatures, 1:12, featureNames);
 
 %%
 
-exportResults(clno, graphIDs, segIDs, statIDs, typeIDs, result_struct, outdir, options) %Export Data
+exportResults(graphIDs, segIDs, statIDs, typeIDs, result_struct, outdir, options) %Export Data
 
 % Export
 
-function exportResults(clno, graphIDs, segIDs, statIDs, typeIDs, result_struct, outdir, options)
+function exportResults(graphIDs, segIDs, statIDs, typeIDs, result_struct, outdir, options)
 
     if options.export_graphs
-        exportGraphsFn(result_struct.data, result_struct.segmentsbv, graphIDs, clno, options.ExportFormat, outdir);
+        exportGraphsFn(result_struct.data, result_struct.segmentsbv, graphIDs, options.clno, options.ExportFormat, outdir);
         disp("Graph Export finished")
     end
 
     if options.export_segments
-        exportSegsFn(result_struct.data, result_struct.segmentsbv, result_struct.feats, segIDs, clno, options.ExportFormat, outdir);
+        exportSegsFn(result_struct.data, result_struct.segmentsbv, result_struct.feats, segIDs, options.clno, options.ExportFormat, outdir);
         disp("Segments Export finished")
     end
 
     if options.export_stats
-        exportStatsFn(result_struct.data, result_struct.stats, statIDs, clno, options.ExportFormat, outdir);
+        exportStatsFn(result_struct.data, result_struct.stats, statIDs, options.clno, options.ExportFormat, outdir);
         disp("Stat Export finished")
     end
 
     if options.export_types
-        exportTypesFn(result_struct.data, result_struct.types, result_struct.typestotal, typeIDs, clno, options.ExportFormat, outdir);
+        exportTypesFn(result_struct.data, result_struct.types, result_struct.typestotal, typeIDs, options.clno, options.ExportFormat, outdir);
         disp("Interaction Type Export finished")
     end
 
     if options.export_results
-        exportResultsFn(result_struct, clno, options.TableFormat, outdir);
+        exportResultsFn(result_struct, options.clno, options.TableFormat, outdir);
     end
 
     beep on; beep; 
