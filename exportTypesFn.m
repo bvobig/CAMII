@@ -1,5 +1,7 @@
 function exportTypesFn (data, types, typestotal, s, clno, expformat, outdir)
 
+set(0, 'DefaultFigureColor', 'white');
+
 expformat1 = strcat("-", expformat);
 %%
 time=data.impro.Time;
@@ -28,7 +30,7 @@ for feat=s
 %%
 %%Combined Figure
 
-distributionFig = tiledlayout(2, 3, "TileSpacing","tight");
+distributionFig = tiledlayout(2, 3, "TileSpacing","tight", Visible="off");
 
 % Actor Loop
 
