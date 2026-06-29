@@ -217,7 +217,7 @@ export_results = true
 
 Additional options allow selection of:
 
-* exported features (Samples) (Default = "All")
+* Exported Features (Default = "All"), Samples: 
 
 ```matlab
 options.GraphFeatures = ["AC","Density"]
@@ -226,13 +226,13 @@ options.StatFeatures = ["Dissonance, MeanVelocity, Tempo"]
 options.TypeFeatures = "MeanPitch"
 ```
 
-* image formats (combined graphics are only exported as .png)
+* Image Formats (combined graphics are only exported as .png)
 
 ```matlab
 options.ExportFormat = "png" (default) or "jpg", "eps", "svg"
 ```
 
-* table formats
+* Table Formats (Default = "xlsx")
 
 ```matlab
 options.TableFormat = "xlsx" (or "csv")
