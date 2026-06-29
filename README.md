@@ -59,9 +59,12 @@ CAMII can be used either through the standalone application or directly within M
 
 ## Recommended: Standalone Application
 
-Execute the installer (`camiiInstaller.exe`).
+Execute the installer under the current CAMII release Assets ("Releases"):
 
-The installer will first install the required MATLAB Runtime and subsequently install the CAMII application.
+CAMII_v.X.X.X_FullInstaller.exe
+CAMII_v.X.X.X_WebInstaller.exe
+
+The installer will first install the required MATLAB Runtime and subsequently install the CAMII application. Depending on the choice, the installation file includes a complete local runtime of MATLAB (FullInstaller) or downloads and installs the current runtime version via web (WebInstaller). 
 
 The application provides functionality for:
 
@@ -171,19 +174,19 @@ The comprehensive `camii` function performs both analysis and export operations.
 Basic syntax:
 
 ```matlab
-results = camii(midi_file, clno)
+results = camii(midi_file)
 ```
 
 Example:
 
 ```matlab
 results = camii( ...
-    "example.mid", ...
-    "ExampleSession", ...
-    export_graphs=true, ...
-    GraphFeatures=["MeanVelocity","Density"], ...
-    ExportFormat="png", ...
-    BufferSize=25);
+    midi_file = "example.mid", ...
+    clno = "ExampleSession", ...
+    export_graphs = true, ...
+    GraphFeatures = ["MeanVelocity","Density"], ...
+    ExportFormat = "png", ...
+    BufferSize = 25);
 ```
 
 ## Inputs
@@ -194,25 +197,63 @@ Path or filename of the MIDI file to be analysed.
 
 ### clno
 
-Identifier used for naming exported files.
+Optional Identifier used for naming exported files. If no identifier is defined, files are named using the current time (yyyyMMdd_HHmmss)
+
+```matlab
+clno = "ExampleSession"
+```
 
 ### Optional Export Parameters
 
 Export options can be activated individually:
 
 ```matlab
-export_graphs=true
-export_segments=true
-export_stats=true
-export_types=true
-export_results=true
+export_graphs = true
+export_segments = true
+export_stats = true
+export_types = true
+export_results = true
 ```
 
 Additional options allow selection of:
 
-* exported features
-* image formats
+* exported features (Samples) (Default = "All")
+
+```matlab
+options.GraphFeatures = ["AC","Density"]
+options.SegFeatures = "All"
+options.StatFeatures = ["Dissonance, MeanVelocity, Tempo"] 
+options.TypeFeatures = "MeanPitch"
+```
+
+* image formats (combined graphics are only exported as .png)
+
+```matlab
+options.ExportFormat = "png" (default) or "jpg", "eps", "svg"
+```
+
 * table formats
+
+```matlab
+options.TableFormat = "xlsx" (or "csv")
+```
+
+### Feature Selection
+
+Avaliable features for analysis and export include all twelve features computable by the MTTB: 
+
+* AC
+* Articulation
+* Density
+* Dissonance
+* Duration
+* Majorness
+* MeanPitch
+* MeanVelocity
+* Minorness
+* StandardPitchDeviation
+* Tempo
+* Tonality 
 
 ---
 
@@ -286,8 +327,8 @@ Example:
 
 ```matlab
 results = camii_analysis( ...
-    "example.mid", ...
-    BufferSize=25);
+    midi_file = "example.mid", ...
+    BufferSize = 25);
 ```
 
 The output contains all intermediate and final analysis results required for subsequent export operations.
@@ -297,7 +338,7 @@ The output contains all intermediate and final analysis results required for sub
 ## Export
 
 ```matlab
-camii_export(results, clno)
+camii_export(results)
 ```
 
 Example:
@@ -305,19 +346,18 @@ Example:
 ```matlab
 camii_export( ...
     results, ...
-    "ExampleSession", ...
-    export_types=true, ...
-    TypeFeatures=["Dissonance","MeanPitch"], ...
-    export_results=true, ...
-    TableFormat="csv");
+    clno = "ExampleSession", ...
+    export_types = true, ...
+    TypeFeatures = ["Dissonance","MeanPitch"], ...
+    export_results = true, ...
+    TableFormat = "csv");
 ```
 
 The export function requires:
 
 * a results structure produced by `camii_analysis`
-* an identifier (`clno`) used for naming exported files
 
-Optional arguments determine:
+Optional arguments (as in the comprehenive function) determine:
 
 * which result types are exported
 * which musical features are included
