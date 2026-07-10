@@ -181,10 +181,19 @@ switch smoothed
         % initiate for loop (3 as first musical feature until end)
         for i=3:26 % MeanVelocityC
                 % Find local maxima and minima of feature i, Prominence adjustable, center selection, mapped onto Time coordinates
-            maxIndices = find(islocalmax(data.smoothed.(i),"MinProminence",sens(i),"FlatSelection","center", ...
+            maxIndices_first = find(islocalmax(data.smoothed.(i),"MinProminence",sens(i),"FlatSelection","first", ...
                 "SamplePoints",data.impro.Time));
-            minIndices = find(islocalmin(data.smoothed.(i),"MinProminence",sens(i),"FlatSelection","center", ...
+            maxIndices_last = find(islocalmax(data.smoothed.(i),"MinProminence",sens(i),"FlatSelection","last", ...
                 "SamplePoints",data.impro.Time));
+
+            maxIndices = sort(unique([maxIndices_first; maxIndices_last]));
+
+            minIndices_first = find(islocalmin(data.smoothed.(i),"MinProminence",sens(i),"FlatSelection","first", ...
+                "SamplePoints",data.impro.Time));
+            minIndices_last = find(islocalmin(data.smoothed.(i),"MinProminence",sens(i),"FlatSelection","last", ...
+                "SamplePoints",data.impro.Time));
+
+            minIndices = sort(unique([minIndices_first; minIndices_last]));
                 
             % indices for beginnings/ends of each player/feature
 

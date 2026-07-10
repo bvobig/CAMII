@@ -1,6 +1,6 @@
 <deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
-  <configuration build-checksum="1795023447" file="E:\camii\camii_app.prj" location="E:\camii" name="camii_app" preferred-package-location="E:\camii\camii_app\for_redistribution" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
-    <param.appname>CAMII</param.appname>
+  <configuration build-checksum="2500228424" file="E:\camii\camii_app.prj" location="E:\camii" name="camii_app" preferred-package-location="E:\camii\camii_app\for_redistribution" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
+    <param.appname>camii_app</param.appname>
     <param.icon>${PROJECT_ROOT}\camii_app_resources\icon.ico</param.icon>
     <param.icons>
       <file>${PROJECT_ROOT}\camii_app_resources\icon_48.png</file>
@@ -8,7 +8,7 @@
       <file>${PROJECT_ROOT}\camii_app_resources\icon_24.png</file>
       <file>${PROJECT_ROOT}\camii_app_resources\icon_16.png</file>
     </param.icons>
-    <param.version>0.2.1</param.version>
+    <param.version>0.1</param.version>
     <param.authnamewatermark>Bastian Vobig</param.authnamewatermark>
     <param.email>bvobig@gmx.de</param.email>
     <param.company />
@@ -16,7 +16,7 @@
     <param.description />
     <param.screenshot />
     <param.guid />
-    <param.installpath.string>\CAMII\</param.installpath.string>
+    <param.installpath.string>\camii_app\</param.installpath.string>
     <param.installpath.combo>option.installpath.programfiles</param.installpath.combo>
     <param.logo />
     <param.install.notes />
@@ -248,7 +248,7 @@
     </fileset.depfun>
     <build-deliverables>
       <file location="${PROJECT_ROOT}\camii_app\for_testing" name="readme.txt" optional="true">E:\camii\camii_app\for_testing\readme.txt</file>
-      <file location="${PROJECT_ROOT}\camii_app\for_testing" name="CAMII.exe" optional="false">E:\camii\camii_app\for_testing\CAMII.exe</file>
+      <file location="${PROJECT_ROOT}\camii_app\for_testing" name="camii_app.exe" optional="false">E:\camii\camii_app\for_testing\camii_app.exe</file>
       <file location="${PROJECT_ROOT}\camii_app\for_testing" name="splash.png" optional="false">E:\camii\camii_app\for_testing\splash.png</file>
     </build-deliverables>
     <workflow />
