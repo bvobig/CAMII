@@ -1,26 +1,18 @@
-function feats = featcalc(data, smoothed, segments, zerodetection, zerothresh)
+function feats = featcalc(data, segments, zerodetection, zerothresh)
  
 % calculates several features for each segment, needs preprocessed data and segments, provided by segmentsol or segmentsbv plus crossings as points of recontextualisation
 % manual zerodetection entry (1=on, 0=off)
 
 %% Crossing calculation
 
-crossings=crossingcalc(data, smoothed);
+crossings=crossingcalc(data);
 
 %% Switch Case whether to Calculate on Original/Raw or Smoothed Data
 
-switch smoothed
-       case 0 % raw data
-            improdata=data.impro;
-            diffdata=data.improdiff;
-            rangetotal=data.rangetotal;
-            ranges=data.range;
-        case 1 % smoothed data
-            improdata=data.smoothed;
-            diffdata=data.smootheddiff;
-            rangetotal=data.rangetotalsmoothed;
-            ranges=data.rangesmoothed;
-end
+improdata=data.smoothed;
+diffdata=data.smootheddiff;
+rangetotal=data.rangetotalsmoothed;
+ranges=data.rangesmoothed;
 
 %% Initiate Feature Loop for all Features
 

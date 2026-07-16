@@ -59,12 +59,12 @@ load ("camii_model.mat", "camii_model") % load ML model
 
 %%
 improdata = mttb_light2(midi_file, 0.1, 6);
-[data, segmentsbv, feats, stats, types, typestotal] = analysis (improdata, camii_model, options); %Analyse Data
+[data, segments, feats, stats, types, typestotal] = analysis (improdata, camii_model, options); %Analyse Data
 
 % Gather Results
 
 results.data=data; 
-results.segmentsbv=segmentsbv;
+results.segments=segments;
 results.feats=feats;
 results.stats=stats;
 results.types=types;
@@ -72,11 +72,11 @@ results.typestotal=typestotal;
 
 % Calculation
 
-function [data, segmentsbv, feats, stats, types, typestotal] = analysis (mttbdata, model, options) %typestruct
+function [data, segments, feats, stats, types, typestotal] = analysis (mttbdata, model, options) %typestruct
 
     data = preproc(mttbdata, 1); disp("1/7 Preprocessing finished")% preprocess mttb data
-    segmentsbv = segmentbv(data, 2, 0, 1); disp("2/7 bvsegmentation finished") % segment data (data, smoothing, prominence values)
-    feats = featcalc(data, 1, segmentsbv, 1, 0.01); disp("3/7 Feature Calculation finished") % calculate features (data, smoothed, segmentmethod, zerodetection, zerothresh)
+    segments = segment_data(data, 3); disp("2/7 bvsegmentation finished") % segment data (data, bend_threshold)
+    feats = featcalc(data, segments, 1, 0.01); disp("3/7 Feature Calculation finished") % calculate features (data, segmentmethod, zerodetection, zerothresh)
     [obsc, obst] = feat2obs (feats); disp("4/7 Observation Transformation finished") % convert features into observations
     [predsc, predst] = applymodel (model, obsc, obst); disp("5/7 Interaction Type Prediction finished") % apply model
     stats = statscalc (obsc, obst, predsc, predst, data, 1, options.BufferSize); disp("6/7 Stat Calculation finished") % calculate stats %buffer*2 is frame in .1s (default = 25)
