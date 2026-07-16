@@ -1,22 +1,23 @@
 function segments = segment_data (data, bend_threshold)
 
-names = string(fieldnames(data.smoothed));
-varnames = names(3:end-3); %begin after Time measurement and end before Property entries
+feature_names = ["AC", "Articulation", "Density", "Dissonance", "Duration", "Majorness", "MeanPitch", "MeanVelocity", "Minorness", "StandardPitchDeviation", "Tempo", "Tonality"]';
+actor_names = ["C", "T"]';
 
-    for i = 1:height(varnames)
-
-        var = varnames(i); %define variable name
+for i = 1:height(feature_names) %feature loop
+    feat = feature_names(i);
+    for a = 1:2 %actor loop
+        actor = actor_names(a);
+        % single actor calculations
+        
+        var = strcat(feat, actor); %define variable name
     
-    seg_data = data.smoothed.(var); %extract data for segmentation
+        seg_data = data.smoothed.(var); %extract data for segmentation
         extrema = get_extrema(seg_data); %get extrema segments
         bends = get_bends(seg_data, bend_threshold); %get bend segments
     
-    all_segments = sortrows([extrema; bends]); %gather results from bend and extrema segmentation
+        all_segments = sortrows([extrema; bends]); %gather results from bend and extrema segmentation
     
-    segments.total.(var) = all_segments.idx; %assign to result struct
-    segments.direction.(var) = all_segments.direction;
-    segments.type.(var) = all_segments.type;
-
+        segments.(feat).(actor) = all_segments; %assign to result struct    
     end
-
+    segments.(feat).crossings = get_crossings(data.impro.Time, data.smoothed.(strcat(feat, "C")), data.smoothed.(strcat(feat, "T")));
 end
