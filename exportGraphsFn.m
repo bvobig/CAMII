@@ -15,10 +15,10 @@ lw = 0.5;
 % MarkerSize
 ms = 5;
 
-for feat = s
+for t = s
 
 %% Feature Selector
-feat = feat_names(s);
+feat = feat_names(t);
 featc = strcat(feat, "C");
 featt = strcat(feat, "T");
 
@@ -70,7 +70,7 @@ featt = strcat(feat, "T");
     set (gcf, 'position', [10 10 lengthplot heightplot], Color="w")
     set (gca, fontname="Times New Roman")
     
-        export_fig(fullfile(outdir, clno + "_graph_" + feat_names((t+1)/2) + "_raw"), expformat1, "-r600");
+        export_fig(fullfile(outdir, clno + "_graph_" + feat + "_raw"), expformat1, "-r600");
 
 % Plot Smoothed Data
 
@@ -89,7 +89,7 @@ featt = strcat(feat, "T");
     set (gcf, 'position', [10 10 lengthplot heightplot], Color="w")
     set (gca, fontname="Times New Roman")
     
-        export_fig(fullfile(outdir, clno + "_graph_" + feat_names((t+1)/2) + "_smoothed"), expformat1, "-r600");
+        export_fig(fullfile(outdir, clno + "_graph_" + feat + "_smoothed"), expformat1, "-r600");
 
 % Plot Raw and Smoothed Data 
     
@@ -111,7 +111,7 @@ featt = strcat(feat, "T");
     set (gcf, 'position', [10 10 lengthplot heightplot], Color="w")
     set (gca, fontname="Times New Roman")
     
-        export_fig(fullfile(outdir, clno + "_graph_" + feat_names((t+1)/2) + "_layered"), expformat1, "-r600");
+        export_fig(fullfile(outdir, clno + "_graph_" + feat + "_layered"), expformat1, "-r600");
 
 %% Plot Single and Combined Segmentations
 
@@ -134,7 +134,7 @@ featt = strcat(feat, "T");
     set (gcf, 'position', [10 10 lengthplot heightplot], Color="w")
     set (gca, fontname="Times New Roman")
     
-        export_fig(fullfile(outdir, clno + "_graph_" + feat_names((t+1)/2) + "_bv_client"), expformat1, "-r600");
+        export_fig(fullfile(outdir, clno + "_graph_" + feat + "_bv_client"), expformat1, "-r600");
 
 % Therapist Segmentation
 
@@ -156,7 +156,7 @@ featt = strcat(feat, "T");
     set (gcf, 'position', [10 10 lengthplot heightplot], Color="w")
     set (gca, fontname="Times New Roman")
     
-        export_fig(fullfile(outdir, clno + "_graph_" + feat_names((t+1)/2) + "_bv_therapist"), expformat1, "-r600");
+        export_fig(fullfile(outdir, clno + "_graph_" + feat + "_bv_therapist"), expformat1, "-r600");
 
 % Combined (including crossings)
 
@@ -182,7 +182,7 @@ featt = strcat(feat, "T");
     set (gcf, 'position', [10 10 lengthplot heightplot], Color="w")
     set (gca, fontname="Times New Roman")
     
-        export_fig(fullfile(outdir, clno + "_graph_" + feat_names((t+1)/2) + "_bv_both"), expformat1, "-r600");
+        export_fig(fullfile(outdir, clno + "_graph_" + feat + "_bv_both"), expformat1, "-r600");
    
 % Combined Graphics
 
@@ -247,7 +247,7 @@ nexttile ([2 1])
     
     title(tile, "Segmentation Process")
     
-        exportgraphics(segmentation, fullfile(outdir, clno + "_graph_" + feat_names((t+1)/2) + "_bv_stacked.png"), Resolution=600)        
+        exportgraphics(segmentation, fullfile(outdir, clno + "_graph_" + feat + "_bv_stacked.png"), Resolution=600)        
 
 end
 

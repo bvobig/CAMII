@@ -90,7 +90,7 @@ outdir = options.OutputFolder;
 
 featureNames = ["AC", "Articulation", "Density", "Dissonance", "Duration", "Majorness", "MeanPitch", "MeanVelocity", "Minorness", "StandardPitchDeviation", "Tempo", "Tonality"];
 
-graphIDs = mapFeatures(options.GraphFeatures, [1 3 5 7 9 11 13 15 17 19 21 23], featureNames);
+graphIDs = mapFeatures(options.GraphFeatures, 1:12, featureNames);
 segIDs = mapFeatures(options.SegFeatures, [1 3 5 7 9 11 13 15 17 19 21 23], featureNames);
 statIDs = mapFeatures(options.StatFeatures, 1:12, featureNames);
 typeIDs = mapFeatures(options.TypeFeatures, 1:12, featureNames);
