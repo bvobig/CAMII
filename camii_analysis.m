@@ -76,7 +76,7 @@ function [data, segments, feats, stats, types, typestotal] = analysis (mttbdata,
 
     data = preproc(mttbdata, 1); disp("1/7 Preprocessing finished")% preprocess mttb data
     segments = segment_data(data, 3); disp("2/7 segmentation finished") % segment data (data, bend_threshold)
-    feats = featcalc(data, segments, 1, 0.01); disp("3/7 Feature Calculation finished") % calculate features (data, segmentmethod, zerodetection, zerothresh)
+    feats = featcalc(data, segments, 0.01); disp("3/7 Feature Calculation finished") % calculate features (data, segments, zerothresh)
     [obsc, obst] = feat2obs (feats); disp("4/7 Observation Transformation finished") % convert features into observations
     [predsc, predst] = applymodel (model, obsc, obst); disp("5/7 Interaction Type Prediction finished") % apply model
     stats = statscalc (obsc, obst, predsc, predst, data, 1, options.BufferSize); disp("6/7 Stat Calculation finished") % calculate stats %buffer*2 is frame in .1s (default = 25)

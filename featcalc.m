@@ -1,212 +1,121 @@
-function feats = featcalc(data, segments, zerodetection, zerothresh)
- 
+function feats = featcalc(data, segments, zerothresh)
 % calculates several features for each segment, needs preprocessed data and segments, provided by segmentsol or segmentsbv plus crossings as points of recontextualisation
 % manual zerodetection entry (1=on, 0=off)
 
-%% Crossing calculation
-
-crossings=crossingcalc(data);
-
-%% Switch Case whether to Calculate on Original/Raw or Smoothed Data
-
+%% extract relevant data
 improdata=data.smoothed;
 diffdata=data.smootheddiff;
 rangetotal=data.rangetotalsmoothed;
 ranges=data.rangesmoothed;
 
-%% Initiate Feature Loop for all Features
+%% Define Feature and Actor names for indexing
+feature_names = ["AC", "Articulation", "Density", "Dissonance", "Duration", "Majorness", "MeanPitch", "MeanVelocity", "Minorness", "StandardPitchDeviation", "Tempo", "Tonality"]';
+actor_names = ["C", "T"]';
 
-fieldname=fieldnames(segments.direction);
-fielddiffname=fieldnames(diffdata);
-varnames=["AC", "Articulation", "Density", "Dissonance", "Duration", "Majorness", "MeanPitch", "MeanVelocity", "Minorness", "StandardPitchDeviation", "Tempo", "Tonality"];
+%% Initiate Single Actor Feature Calculations
 
-% looping in 1 steps until 12 for fielddiffname and varname, loop is integrated 
-% looping in 2 steps until 23 for features (always client and therapist next to each other)
-% y added by +1 to change indication from client to therapist
+for f=1:height(feature_names)
+    feat = feature_names(f);
 
-for y=1:2:23 % 15
-z=(y+1)/2; % varname indicator
+    for a = 1:height(actor_names)
+        actor = actor_names(a);
+        var = strcat(feat, actor); %define data column from feat and actor
 
-% Create actor vectors and action type vectors
+    clearvars -except a actor f feat feats var features feature_names actor_names improdata diffdata rangetotal ranges zerothresh segments data mttbdata
+   
 
-%indexes, assign agent to action, create name variables 
-clear client therapist
-client(1:height(segments.total.(fieldname{y})), 1)="C";
-actionc(1:height(segments.total.(fieldname{y})), 1)="act";
-therapist(1:height(segments.total.(fieldname{y+1})), 1)="T";
-actiont(1:height(segments.total.(fieldname{y+1})), 1)="act";
-cross(1:width(crossings.(varnames(z))), 1)="crossing";
-
-%% Single Actor Calculations
-
-% Client 
-
-%toown  
-    % transform action idx, times and actor to table
-    timesc=improdata.Time(segments.total.(fieldname{y}));
-    segmentsc=table(segments.total.(fieldname{y}), segments.type.(fieldname{y}), timesc , client, actionc, VariableNames=["idx", "segtype", "time", "actor", "type"]);
-    % calculate differences between own actions plus time until last action ends
-    segmentscdiff=table([diff(improdata.Time(segmentsc.idx)); improdata.Time(data.endC)-improdata.Time(segmentsc.idx(end))]);
-    % calculate both into a table
-    segmentsc=[segmentsc, segmentscdiff];
+    %Create actor vectors and action type vectors
+        actor_str(1:height(segments.(feat).(actor))) = actor; actor_str = actor_str';
+        action_str(1:height(segments.(feat).(actor))) = "act"; action_str = action_str';
+        cross_str(1:height(segments.(feat).crossings)) ="crossing"; cross_str = cross_str';
+    %% Single Actor Calculations
     
-    % rename Var1 to own time
-    segmentsc=renamevars(segmentsc, "Var1", "ctoown");
-    
+    % toown  
+        % transform action idx, times and actor to table
+        times = improdata.Time(segments.(feat).(actor).idx);
+        feature_table=table(segments.(feat).(actor).idx, segments.(feat).(actor).type, times , actor_str, action_str, VariableNames=["idx", "segtype", "time", "actor", "type"]);
+        % calculate differences between own actions plus time until last action ends
+        feature_table_diff=table([diff(improdata.Time(feature_table.idx)); improdata.Time(data.(strcat("end", actor)))-improdata.Time(feature_table.idx(end))]);
+        % concatenate both into a table
+        feature_table=[feature_table, feature_table_diff];
+        feature_table=renamevars(feature_table, "Var1", "toown");     % rename Var1 to own time
+
     % add values at segments
-    segmentsc.cvalue=improdata.(fieldname{y})(segmentsc.idx);
+        feature_table.value = improdata.(var)(feature_table.idx);
 
-% fromown
-    % preallocation
-    fromown=zeros(height(segmentsc), 1);
-    fromown(1)=NaN;
-    for i=2:height(segmentsc)
-        fromown(i)=improdata.Time(segmentsc.idx(i))-improdata.Time(segmentsc.idx(i-1));
-    end
-    segmentsc.cfromown=fromown;
-
-% Direction
-    % calculated directly in segmentation
-    segmentsc.cdirection=segments.direction.(fieldname{y});
-
-% abschgvalue (Absolute Change Value)
-    % preallocation
-    cabschgval=NaN(height(segmentsc)-1,1);
-    % differences between next and current entry (difference to next), positive
-    % = ascending curve, negative = descending curve
-    for i=1:(height(segmentsc)-1)
-        if ~isnan(segmentsc.cdirection(i)) % if no ending
-        cabschgval(i)=segmentsc.cvalue(i+1)-segmentsc.cvalue(i);
-        elseif isnan(segmentsc.cdirection(i))
-        cabschgval(i)=NaN;
+    % fromown
+        % preallocation
+        feature_table.fromown=zeros(height(feature_table), 1);
+        feature_table.fromown(1)=NaN;
+        for i=2:height(feature_table)
+            feature_table.fromown(i)=improdata.Time(feature_table.idx(i))-improdata.Time(feature_table.idx(i-1));
         end
-    end
-    cabschgval=[cabschgval; improdata.(fieldname{y})(data.endC)-segmentsc.cvalue(end)];
-    % assign abschgvalue to table
-    segmentsc.cabschgvalue=cabschgval;
 
-% chngfactor
-    % preallocation
-    changevaluesc=zeros(height(segmentsc)-1, 1);
-    for i=1:(height(segmentsc)-1)
-        if ~isnan(segmentsc.cdirection(i)) % if no ending
-        changevaluesc(i)=segmentsc.cvalue(i+1)/segmentsc.cvalue(i);
-        elseif isnan(segmentsc.cdirection(i))
-        changevaluesc(i)=NaN;
+    % Direction
+        % calculated directly in segmentation
+        feature_table.direction=segments.(feat).(actor).direction;
+
+    % abschgvalue (Absolute Change Value)
+        abschgval=NaN(height(feature_table)-1,1); % preallocation
+        % differences between next and current entry (difference to next), positive
+        % = ascending curve, negative = descending curve
+        for i=1:(height(feature_table)-1)
+            if ~isnan(feature_table.direction(i)) % if no ending
+            abschgval(i)=feature_table.value(i+1)-feature_table.value(i);
+            elseif isnan(feature_table.direction(i))
+            abschgval(i)=NaN;
+            end
         end
-    end
-    changevaluesc=[changevaluesc; improdata.(fieldname{y})(data.endC)/segmentsc.cvalue(end)];
-    % assign changevalues to table
-    segmentsc.cchngfactor=changevaluesc;
+        abschgval=[abschgval; improdata.(var)(data.endC)-feature_table.value(end)];
+        % assign abschgvalue to table
+        feature_table.abschgvalue=abschgval;
 
-% rangepercent, totalrangepercent
-    % percentage of change compared to total range
-    segmentsc.crangepercent=segmentsc.cabschgvalue/ranges.(fieldname{y});
-    segmentsc.ctotalrangepercent=segmentsc.cabschgvalue/rangetotal.(z);
+    % chngfactor
+        changevalues=zeros(height(feature_table)-1, 1); % preallocation
+        for i=1:(height(feature_table)-1)
+            if ~isnan(feature_table.direction(i)) % if no ending
+            changevalues(i)=feature_table.value(i+1)/feature_table.value(i);
+            elseif isnan(feature_table.direction(i))
+            changevalues(i)=NaN;
+            end
+        end
+        changevalues=[changevalues; improdata.(var)(data.endC)/feature_table.value(end)];
+        % assign changevalues to table
+        feature_table.cchngfactor=changevalues;
 
-% indivintensity, totalintensity, absintensity
-    % calculate rangepercent vs. time - intensity value. change in percentage of
-    % range per second
-    segmentsc.cindivintensity=segmentsc.crangepercent./segmentsc.ctoown;
-    segmentsc.ctotalintensity=segmentsc.ctotalrangepercent./segmentsc.ctoown;
-    segmentsc.cabsintensity=segmentsc.cabschgvalue./segmentsc.ctoown;
-    % zerothresh direction
-    
+    % rangepercent, totalrangepercent
+        % percentage of change compared to total range
+        feature_table.rangepercent=feature_table.abschgvalue/ranges.(var);
+        feature_table.totalrangepercent=feature_table.abschgvalue/rangetotal.(feat);
+
+    % indivintensity, totalintensity, absintensity
+        % calculate rangepercent vs. time - intensity value. change in percentage of
+        % range per second
+        feature_table.indivintensity=feature_table.rangepercent./feature_table.toown;
+        feature_table.totalintensity=feature_table.totalrangepercent./feature_table.toown;
+        feature_table.absintensity=feature_table.abschgvalue./feature_table.toown;
+
     % zero Direction calculation as in/decrease smaller than 0.01 intensity (1 positive, -1 negative, 0 neutral)
-    % segmentsc.direction(segmentsc.intensity > -0.01 & segmentsc.intensity < 0.01) = 0;
-    switch zerodetection % only assign zero if the original value is not NaN, so that ends aren't reinterpreted
-        case 1
-            segmentsc.cdirection(abs(segmentsc.cindivintensity) < zerothresh & ~isnan(segmentsc.cdirection))=0;
-    end
+        % segmentsc.direction(segments.intensity > -0.01 & segments.intensity < 0.01) = 0;
+        % only assign zero if the original value is not NaN, so that ends aren't reinterpreted
+        feature_table.direction(abs(feature_table.indivintensity) < zerothresh & ~isnan(feature_table.direction)) = 0;
 
+        feature_table = renamevars(feature_table, string(feature_table.Properties.VariableNames(6:end)) , strcat(lower(actor), string(feature_table.Properties.VariableNames(6:end)))); %rename actor specific features
+        features.(actor) = feature_table;
 
-% Therapist
-
-% toown
-    timest=improdata.Time(segments.total.(fieldname{y+1}));
-    segmentst=table(segments.total.(fieldname{y+1}), segments.type.(fieldname{y+1}), timest, therapist, actiont, VariableNames=["idx", "segtype", "time", "actor", "type"]);
-    segmentstdiff=table([diff(improdata.Time(segmentst.idx)); improdata.Time(data.endT)-improdata.Time(segmentst.idx(end))]);
-    segmentst=[segmentst, segmentstdiff];
-    segmentst=renamevars(segmentst, "Var1", "ttoown");
-    segmentst.tvalue=improdata.(fieldname{y+1})(segmentst.idx);
-
-% fromown
-    fromown=zeros(height(segmentst), 1);
-    fromown(1)=NaN;
-    for i=2:height(segmentst)
-        fromown(i)=improdata.Time(segmentst.idx(i))-improdata.Time(segmentst.idx(i-1));
-    end
-    segmentst.tfromown=fromown;
-
-% Direction
-    % computed in segmentation functions
-    segmentst.tdirection=segments.direction.(fieldname{y+1});
-
-% abschgvalue
-    % preallocation
-    abschgvalt=NaN(height(segmentst)-1,1);
-    % differences between next and current entry (difference to next), positive
-    % = ascending curve, negative = descending curve
-    for i=1:(height(segmentst)-1)
-        if ~isnan(segmentst.tdirection(i)) % if no ending
-        abschgvalt(i)=segmentst.tvalue(i+1)-segmentst.tvalue(i);
-        elseif isnan(segmentst.tdirection(i))
-        abschgvalt(i)=NaN;
-        end
-    end
-    abschgvalt=[abschgvalt; improdata.(fieldname{y+1})(data.endT)-segmentst.tvalue(end)];
-    % assign abschgvalue to table
-    segmentst.tabschgvalue=abschgvalt;
-
-% chngfactor
-    changevaluest=zeros(height(segmentst)-1, 1);
-    for i=1:(height(segmentst)-1)
-        if ~isnan(segmentst.tdirection(i)) % if no ending
-        changevaluest(i)=segmentst.tvalue(i+1)/segmentst.tvalue(i);
-        elseif isnan(segmentst.tdirection(i))
-        changevaluest(i)=NaN;
-        end
-    end
-    changevaluest=[changevaluest; improdata.(fieldname{y+1})(data.endT)/segmentst.tvalue(end)];
-    
-    segmentst.tchngfactor=changevaluest;
-
-% rangepercent/totalrangepercent
-    % percentage of change compared to total range
-    segmentst.trangepercent=segmentst.tabschgvalue/ranges.(fieldname{y+1});
-    segmentst.ttotalrangepercent=segmentst.tabschgvalue/rangetotal.(z);
-
-% indidintensity, totalintensity, absintensity
-    % calculate rangepercent vs. time - intensity value. change in percentage of
-    % range per second
-    segmentst.tindivintensity=segmentst.trangepercent./segmentst.ttoown;
-    segmentst.ttotalintensity=segmentst.ttotalrangepercent./segmentst.ttoown;
-    segmentst.tabsintensity=segmentst.tabschgvalue./segmentst.ttoown;
-
-    % zerothresh direction
-    % zero Direction calculation as in/decrease smaller than 0.01 intensity (1 positive, -1 negative, 0 neutral)
-    % segmentst.direction(segmentst.intensity > -0.01 & segmentst.intensity < 0.01) = 0;
-    
-    switch zerodetection
-        case 1
-            segmentst.tdirection(abs(segmentst.tindivintensity) < zerothresh & ~isnan(segmentst.tdirection))=0;
     end
 
 %% Concatenation of Therapist and Client tables
-
-tblwidth=width(segmentsc);
-
+tblwidth=width(features.C);
 % prepare ctable for concatenation
-tblsegmentsc=[segmentsc, array2table(NaN(height(segmentsc), tblwidth-5))];
+tblsegmentsc=[features.C, array2table(NaN(height(features.C), tblwidth-5))];
+tblsegmentst=[features.T, array2table(NaN(height(features.T), tblwidth-5))];
 
 segmentwidth=width(tblsegmentsc);
 
-tblsegmentsc.Properties.VariableNames(tblwidth+1:segmentwidth)=segmentst.Properties.VariableNames(6:16);
-
+tblsegmentsc.Properties.VariableNames(tblwidth+1:segmentwidth)=features.T.Properties.VariableNames(6:16);
 % prepare ttable for concatenation
-tblsegmentst=[segmentst, array2table(NaN(height(segmentst), tblwidth-5))];
-tblsegmentst.Properties.VariableNames(tblwidth+1:segmentwidth)=segmentsc.Properties.VariableNames(6:16);
-
+tblsegmentst.Properties.VariableNames(tblwidth+1:segmentwidth)=features.C.Properties.VariableNames(6:16);
 % concatenate both tables
 segmentsct=sortrows([tblsegmentsc; tblsegmentst], "time", "ascend");
 
@@ -223,19 +132,20 @@ for i=interactionbegin:height(segmentsct)
             fromother(i)=segmentsct.time(i)-segmentsct.time(i-1); % create new time
         end
 end
+
 segmentsct.fromother=fromother;
 
 %% Prepare and insert Crossings
 
 % create array of crossings plus empty columns for variables for later
 % concatenation
-crossingsarray=crossings.(varnames(z))';
+crossingsarray=segments.(feat).crossings{:, 1:2};
 empty=NaN(height(crossingsarray), 1);
 
-crossarray4tbl=[empty, empty, crossingsarray(:, 1), empty, empty, empty, crossingsarray(:, 2), NaN(height(crossingsarray), (segmentwidth-6))];
+crossarray4tbl=[empty, empty, segments.(feat).crossings{:, 1}, empty, empty, empty, segments.(feat).crossings{:, 2}, NaN(height(segments.(feat).crossings{:, 1:2}), (segmentwidth-6))];
 
 crosstable=array2table(crossarray4tbl, "VariableNames", segmentsct.Properties.VariableNames);
-crosstable.type=cross;
+crosstable.type=cross_str;
 
 % concatenate and sort both into single table
 segmentstotal=sortrows([segmentsct; crosstable], "time", "ascend");
@@ -244,28 +154,27 @@ segmentstotal=sortrows([segmentsct; crosstable], "time", "ascend");
 %% Combined Actor Calculations
 
 % Fill movement information (doubles)
-
 % fill crossing information for therapist
 segmentstotal.tvalue(segmentstotal.type=="crossing")=segmentstotal.cvalue(segmentstotal.type=="crossing");
 
     % client side
-    segmentstotal.cvalue(segmentstotal.actor=="T")=improdata.(fieldname{y})(segmentstotal.idx(segmentstotal.actor=="T"));
+    segmentstotal.cvalue(segmentstotal.actor=="T")=improdata.(strcat(feat,"C"))(segmentstotal.idx(segmentstotal.actor=="T"));
     
-    for f=9:16 % double values for client movement information
+    for x=9:16 % double values for client movement information
         for i=2:height(segmentstotal)
-           if isnan(segmentstotal.(f)(i)) & ~isnan(segmentstotal.cvalue(i)) & ~(segmentstotal.actor(i)=="C" & isnan(segmentstotal.cdirection(i))) % if current entry is empty, but theres a value and current entry is no end of play
-               segmentstotal.(f)(i)=segmentstotal.(f)(i-1);
+           if isnan(segmentstotal.(x)(i)) & ~isnan(segmentstotal.cvalue(i)) & ~(segmentstotal.actor(i)=="C" & isnan(segmentstotal.cdirection(i))) % if current entry is empty, but theres a value and current entry is no end of play
+               segmentstotal.(x)(i)=segmentstotal.(x)(i-1);
           end
        end
     end
     
     % therapist side
-    segmentstotal.tvalue(segmentstotal.actor=="C")=improdata.(fieldname{y+1})(segmentstotal.idx(segmentstotal.actor=="C"));
+    segmentstotal.tvalue(segmentstotal.actor=="C")=improdata.(strcat(feat,"T"))(segmentstotal.idx(segmentstotal.actor=="C"));
     
-    for f=20:27 % double values for therapist movement information
+    for x=20:27 % double values for therapist movement information
         for i=2:height(segmentstotal)
-           if isnan(segmentstotal.(f)(i)) & ~isnan(segmentstotal.tvalue(i)) & ~(segmentstotal.actor(i)=="T" & isnan(segmentstotal.tdirection(i))) % if current entry is empty, but theres a value and current entry is no end of play
-               segmentstotal.(f)(i)=segmentstotal.(f)(i-1);
+           if isnan(segmentstotal.(x)(i)) & ~isnan(segmentstotal.tvalue(i)) & ~(segmentstotal.actor(i)=="T" & isnan(segmentstotal.tdirection(i))) % if current entry is empty, but theres a value and current entry is no end of play
+               segmentstotal.(x)(i)=segmentstotal.(x)(i-1);
           end
        end
     end
@@ -280,6 +189,7 @@ segmentstotal.tvalue(segmentstotal.type=="crossing")=segmentstotal.cvalue(segmen
             end
         end
     end
+
 
 % relchgtendencies
 
@@ -473,7 +383,7 @@ segmentstotal.tvalue(segmentstotal.type=="crossing")=segmentstotal.cvalue(segmen
     segmentstotal.featdelta = segmentstotal.cvalue-segmentstotal.tvalue;
     
     % calculate percentage of delta in relation to common total range of feature
-    segmentstotal.featdeltapercent=segmentstotal.featdelta/rangetotal.(z);
+    segmentstotal.featdeltapercent=segmentstotal.featdelta/rangetotal.(feat);
     
 % Delta Tendencies between each index (absolute)
     % last inter(action) isn't followed by another action - therefore no
@@ -485,7 +395,7 @@ segmentstotal.tvalue(segmentstotal.type=="crossing")=segmentstotal.cvalue(segmen
     % Delta Tendencies Percentage 
     
     % calculate percentage of delta tendencies in relation to common total range of feature
-    segmentstotal.featdeltapercentdiff=segmentstotal.featdeltadifference/rangetotal.(z);
+    segmentstotal.featdeltapercentdiff=segmentstotal.featdeltadifference/rangetotal.(feat);
     
 % calculate mean delta value for current segment
     
@@ -494,7 +404,7 @@ segmentstotal.tvalue(segmentstotal.type=="crossing")=segmentstotal.cvalue(segmen
         begintime=segmentstotal.time(h);
         endtime=segmentstotal.time(h+1);
         between=(begintime < data.smoothed.Time) & (data.smoothed.Time < endtime); % extract time idxs between current and next interaction
-        betweendata=diffdata.(z)(between); % extract data between actions
+        betweendata=diffdata.(strcat(feat, "Diff"))(between); % extract data between actions
         deltadata=[segmentstotal.featdelta(h); betweendata; segmentstotal.featdelta(h+1)]; % concatenate and calculate mean of data in between plus the single entries - slightly unprecise measure for crossings as they are calculated as if .1s duration
         featdeltamean(h)=mean(deltadata);
     
@@ -507,7 +417,7 @@ segmentstotal.tvalue(segmentstotal.type=="crossing")=segmentstotal.cvalue(segmen
         begintime=segmentstotal.time(end); % last time value is beginning
         endtime=data.smoothed.Time(find(~isnan(data.smoothed.Time), 1, "last")); % end is the end of the impro data (last non NaN entry)
         between=(begintime < data.smoothed.Time) & (data.smoothed.Time <= endtime); % extract time idxs util end
-        betweendata=diffdata.(z)(between); % extract data until end
+        betweendata=diffdata.(strcat(feat, "Diff"))(between); % extract data until end
         deltadata=[segmentstotal.featdelta(end); betweendata]; % concatenate beginning and remaining data
         featdeltamean(end+1)=mean(deltadata); % calculate mean of concatenated data
     
@@ -515,16 +425,15 @@ segmentstotal.tvalue(segmentstotal.type=="crossing")=segmentstotal.cvalue(segmen
 
 
 % featdeltameanpercent
-    segmentstotal.featdeltameanpercent=segmentstotal.featdeltamean/data.rangetotal.(z);
+    segmentstotal.featdeltameanpercent=segmentstotal.featdeltamean/data.rangetotal.(feat);
 
 %% show resulting table, sort and assign to new struct for features
 
-feats.(varnames(z))=segmentstotal(:, ["idx", "time", "segtype", "type", "actor", "fromother", "tonext", "cvalue", "cdirection", "cabsintensity", "ctotalintensity", "crelintensity", "crelchgtendency", "tvalue", "tdirection", "tabsintensity", "ttotalintensity", "trelintensity", "trelchgtendency","featdeltapercent", "featdeltapercentdiff", "featdeltameanpercent"]);
+feats.(feat)=segmentstotal(:, ["idx", "time", "segtype", "type", "actor", "fromother", "tonext", "cvalue", "cdirection", "cabsintensity", "ctotalintensity", "crelintensity", "crelchgtendency", "tvalue", "tdirection", "tabsintensity", "ttotalintensity", "trelintensity", "trelchgtendency","featdeltapercent", "featdeltapercentdiff", "featdeltameanpercent"]);
 
-% increase z-value for next feature loop 
-z=z+1;
 % clear variables for next loop
-clearvars -except z feats counter varnames data fielddiffname fieldname segments mttbdata y crossings zerothresh segmentstotal improdata diffdata rangetotal ranges zerodetection
+clearvars -except feature_names actor_names feats feat data segments mttbdata zerothresh segmentstotal improdata diffdata rangetotal ranges zerodetection
 
 end
+
 end
