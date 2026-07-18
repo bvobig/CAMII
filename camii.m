@@ -111,7 +111,7 @@ exportResults(data, segments, feats, stats, types, typestotal, graphIDs, segIDs,
 function [data, segments, feats, stats, types, typestotal] = analysis (mttbdata, model, options) %typestruct
 
     data = preproc(mttbdata, 1); disp("1/7 Preprocessing finished")% preprocess mttb data
-    segments = segment_data(data, 3); disp("2/7 segmentation finished") % segment data (data, bend_threshold)
+    segments = segment_data(data, 1); disp("2/7 segmentation finished") % segment data (data, bend_threshold)
     feats = featcalc(data, segments, 0.01); disp("3/7 Feature Calculation finished") % calculate features (data, segments, zerothresh)
     [obsc, obst] = feat2obs (feats); disp("4/7 Observation Transformation finished") % convert features into observations
     [predsc, predst] = applymodel (model, obsc, obst); disp("5/7 Interaction Type Prediction finished") % apply model

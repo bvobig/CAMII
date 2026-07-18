@@ -1,45 +1,71 @@
-function bend_table = get_bends(data, threshold_slope)
+function bend_table = get_bends(data, threshold_angle_deg, scale_method)
+%retrieves curve bend segments based on a slope-angle threshold
 
-%retrieves curve bend segments based on manually defined threshold slope
+arguments
+    data (:,1) double
+    threshold_angle_deg (1,1) double {mustBePositive} = 1
+    scale_method (1,1) string {mustBeMember(scale_method, ["zscore","mad","none"])} = "zscore"
+end
 
-% calculate first derivation
-slopes = [NaN; diff(data)];
+%% normalize scale so the angle is comparable regardless of this
+% feature's original units/magnitude
+switch scale_method
+    case "zscore"
+        s = std(data, 'omitnan');
+        if s == 0 || isnan(s)
+            s = 1; % constant/degenerate series -> no scaling needed
+        end
+        data_scaled = (data - mean(data, 'omitnan')) / s;
+    case "mad"
+        m = mad(data, 1); % median absolute deviation
+        if m == 0 || isnan(m)
+            m = 1;
+        end
+        data_scaled = (data - median(data, 'omitnan')) / m;
+    case "none"
+        data_scaled = data;
+end
 
-% gather all local extrema to omit when detecting slopes
-extrema = sort([find(islocalmax(data, FlatSelection="all")); find(islocalmin(data, FlatSelection="all"))]);
+%% calculate first derivation (assumes equidistant sampling, dx = 1)
+slopes = [NaN; diff(data_scaled)];
+n = height(slopes);
 
-% calculate change factors between slopes
-slope_factor(height(slopes)) = NaN; %preallocation
+% segment angle in degrees: atand is defined everywhere (even at
+% slope=0), unlike the division used in the factor approach
+theta = atand(slopes);
 
-for i = 1:height(slopes)-1 
-    if i ~= extrema
-        slope_factor(i) = slopes(i+1)/slopes(i); %calculate changing factor from next to current slope value
+%% gather all local extrema to omit when detecting bends
+extrema_idx = sort([find(islocalmax(data, "FlatSelection", "all")); ...
+                     find(islocalmin(data, "FlatSelection", "all"))]);
+is_extremum = false(n, 1);
+is_extremum(extrema_idx) = true;
+
+% angle difference between consecutive segments (only where there is no
+% direction reversal -> "continuous" behavior change within the same
+% trend direction)
+delta_theta = NaN(n, 1);
+for i = 1:n-1
+    if ~is_extremum(i)
+        delta_theta(i) = theta(i+1) - theta(i);
     end
 end
 
-% extract relevant slopes (threshold_slop = default is 3)
+%% extract relevant slopes (threshold_angle_deg default is 15)
+bend = abs(delta_theta) > threshold_angle_deg;
+bend_idx = find(bend);
 
-bend = abs(slope_factor) > threshold_slope | abs(slope_factor) < 1/threshold_slope & abs(slope_factor) > 0;
-bend_idx = find(bend)';
-%%
-%detect direction
-direction(height(bend_idx)) = NaN;
-
-for b = 1:height(bend_idx) %identify direction based on slope after idx value
-    if slopes(bend_idx(b)+1) < 0
-        direction(b) = -1;
-    elseif slopes(bend_idx(b)+1) > 0
-        direction(b) = 1;
+%% detect direction based on slope after idx value
+direction = NaN(numel(bend_idx), 1);
+for b = 1:numel(bend_idx)
+    idx = bend_idx(b);
+    if idx + 1 <= n
+        direction(b) = sign(slopes(idx + 1));
     end
 end
 
-bend_direction = direction';
-%%
-%add segmentation type
-bend_table = table(bend_idx);
-bend_table.bend_type(1:height(bend_table)) = "bend";
-bend_table.bend_direction = bend_direction;
+%% add segmentation type
+bend_table = table(bend_idx, direction, 'VariableNames', {'idx', 'direction'});
+bend_table.type(1:height(bend_table)) = "bend";
+bend_table = bend_table(:, {'idx', 'type', 'direction'});
 
-bend_table = renamevars(bend_table, ["bend_idx", "bend_type", "bend_direction"], ["idx", "type", "direction"]);
-%%
 end

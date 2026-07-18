@@ -1,4 +1,4 @@
-function segments = segment_data (data, bend_threshold)
+function segments = segment_data (data, threshold_angle_deg)
 
 feature_names = ["AC", "Articulation", "Density", "Dissonance", "Duration", "Majorness", "MeanPitch", "MeanVelocity", "Minorness", "StandardPitchDeviation", "Tempo", "Tonality"]';
 actor_names = ["C", "T"]';
@@ -13,7 +13,7 @@ for i = 1:height(feature_names) %feature loop
     
         seg_data = data.smoothed.(var); %extract data for segmentation
         extrema = get_extrema(seg_data); %get extrema segments
-        bends = get_bends(seg_data, bend_threshold); %get bend segments
+        bends = get_bends(seg_data, threshold_angle_deg); %get bend segments
     
         all_segments = sortrows([extrema; bends]); %gather results from bend and extrema segmentation
     
