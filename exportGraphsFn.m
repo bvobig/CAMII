@@ -26,7 +26,7 @@ featt = strcat(feat, "T");
     client = data.impro.(featc);
     csmoothed = data.smoothed.(featc);
 
-    extrema_c_idx = segments.(feat).C.idx(segments.(feat).C.type == "min" | segments.(feat).C.type == "max");
+    extrema_c_idx = segments.(feat).C.idx(segments.(feat).C.type == "min" | segments.(feat).C.type == "max" | segments.(feat).C.type == "begin" | segments.(feat).C.type == "end");
     extrema_c_time = time(extrema_c_idx);
     extrema_c_values = csmoothed(extrema_c_idx);
     bend_c_idx = segments.(feat).C.idx(segments.(feat).C.type =="bend");
@@ -36,7 +36,7 @@ featt = strcat(feat, "T");
     therapist=data.impro.(featt);
     tsmoothed=data.smoothed.(featt);
     
-    extrema_t_idx = segments.(feat).T.idx(segments.(feat).T.type == "min" | segments.(feat).T.type == "max");
+    extrema_t_idx = segments.(feat).T.idx(segments.(feat).T.type == "min" | segments.(feat).T.type == "max" | segments.(feat).T.type == "begin" | segments.(feat).T.type == "end");
     extrema_t_time = time(extrema_t_idx);
     extrema_t_values = tsmoothed(extrema_t_idx);
     bend_t_idx = segments.(feat).T.idx(segments.(feat).T.type =="bend");
