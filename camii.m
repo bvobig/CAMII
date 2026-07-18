@@ -131,7 +131,7 @@ function exportResults(data, segments, feats, stats, types, typestotal, graphIDs
     end
 
     if options.export_segments
-        exportSegsFn(data, segments, feats, segIDs, options.clno, options.ExportFormat, outdir);
+        exportSegsFn(data, feats, segIDs, options.clno, options.ExportFormat, outdir);
         disp("Segments Export finished")
     end
 

@@ -42,7 +42,7 @@ outdir = options.OutputFolder;
 featureNames = ["AC", "Articulation", "Density", "Dissonance", "Duration", "Majorness", "MeanPitch", "MeanVelocity", "Minorness", "StandardPitchDeviation", "Tempo", "Tonality"];
 
 graphIDs = mapFeatures(options.GraphFeatures, 1:12, featureNames);
-segIDs = mapFeatures(options.SegFeatures, [1 3 5 7 9 11 13 15 17 19 21 23], featureNames);
+segIDs = mapFeatures(options.SegFeatures, 1:12, featureNames);
 statIDs = mapFeatures(options.StatFeatures, 1:12, featureNames);
 typeIDs = mapFeatures(options.TypeFeatures, 1:12, featureNames);
 
@@ -60,7 +60,7 @@ function exportResults(graphIDs, segIDs, statIDs, typeIDs, result_struct, outdir
     end
 
     if options.export_segments
-        exportSegsFn(result_struct.data, result_struct.segments, result_struct.feats, segIDs, options.clno, options.ExportFormat, outdir);
+        exportSegsFn(result_struct.data, result_struct.feats, segIDs, options.clno, options.ExportFormat, outdir);
         disp("Segments Export finished")
     end
 
