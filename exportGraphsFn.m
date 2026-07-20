@@ -1,6 +1,5 @@
 function exportGraphsFn (data, segments, s, clno, expformat, outdir)
 
-expformat1=strcat("-",expformat);
 feat_names=["AC", "Articulation", "Density", "Dissonance", "Duration", "Majorness", "MeanPitch", "MeanVelocity", "Minorness", "StandardPitchDeviation", "Tempo", "Tonality"];
 
 %% Prepare Data for Plotting and Define Plotting Variables
@@ -54,11 +53,13 @@ featt = strcat(feat, "T");
 
 %Plot Raw Data
 
-    figure(Visible = "off") 
-    plot (time, client, "g", DisplayName="Client", LineWidth=lw)
-    hold on
+    rawfig = figure(Visible = "off"); 
+    rawfig_ax = axes(rawfig); 
+
+    plot (rawfig_ax, time, client, "g", DisplayName="Client", LineWidth=lw)
+    hold (rawfig_ax, "on") 
     plot(time, therapist, "k", DisplayName="Therapist", LineWidth=lw)
-    hold off
+    hold (rawfig_ax, "off")
     % xticks(ticks)
     ylim([downlim uplim])
     
@@ -67,18 +68,21 @@ featt = strcat(feat, "T");
     xlabel("Time in Seconds (s)")
     ylabel(feat)
     
-    set (gcf, 'position', [10 10 lengthplot heightplot], Color="w")
-    set (gca, fontname="Times New Roman")
+    set (rawfig, 'position', [10 10 lengthplot heightplot], Color="w")
+    set (rawfig_ax, fontname="Times New Roman")
     
-        export_fig(fullfile(outdir, clno + "_graph_" + feat + "_raw"), expformat1, "-r600");
+        exportgraphics(rawfig, fullfile(outdir, clno + "_graph_" + feat + "_raw." + expformat), Resolution=600)
+        close(rawfig)
 
 % Plot Smoothed Data
 
-    figure(Visible = "off") 
-    plot (time, csmoothed, "g", LineWidth=lw, DisplayName="Client Smoothed")
-    hold on 
-    plot(time, tsmoothed, "k", LineWidth=lw, DisplayName="Therapist Smoothed")
-    hold off
+    smoothfig = figure(Visible = "off"); 
+    smoothfig_ax = axes(smoothfig); 
+
+    plot (smoothfig_ax, time, csmoothed, "g", LineWidth=lw, DisplayName="Client Smoothed")
+    hold (smoothfig_ax, "on")
+    plot(smoothfig_ax, time, tsmoothed, "k", LineWidth=lw, DisplayName="Therapist Smoothed")
+    hold (smoothfig_ax, "off")
     
     ylim([downlim uplim])
     legend (Location="northeast")
@@ -86,20 +90,23 @@ featt = strcat(feat, "T");
     xlabel("Time in Seconds (s)")
     ylabel(feat)
     
-    set (gcf, 'position', [10 10 lengthplot heightplot], Color="w")
-    set (gca, fontname="Times New Roman")
+    set (smoothfig, 'position', [10 10 lengthplot heightplot], Color="w")
+    set (smoothfig_ax, fontname="Times New Roman")
     
-        export_fig(fullfile(outdir, clno + "_graph_" + feat + "_smoothed"), expformat1, "-r600");
+        exportgraphics(smoothfig, fullfile(outdir, clno + "_graph_" + feat + "_smoothed." + expformat), Resolution=600)
+        close(smoothfig)
 
 % Plot Raw and Smoothed Data 
     
-    figure(Visible = "off") 
-    plot(time, client, "g:", DisplayName="Client Raw", LineWidth=lw)
-    hold on 
-    plot(time, therapist, "k:", DisplayName="Therapist Raw", LineWidth=lw)
-    plot(time, csmoothed, "g", LineWidth=lw*1.5, DisplayName="Client Smoothed")
-    plot(time, tsmoothed, "k", LineWidth=lw*1.5, DisplayName="Therapist Smoothed")
-    hold off
+    rawsmoothfig = figure(Visible = "off");
+    rawsmoothfig_ax = axes(rawsmoothfig); 
+
+    plot(rawsmoothfig_ax, time, client, "g:", DisplayName="Client Raw", LineWidth=lw)
+    hold(rawsmoothfig_ax, "on")
+    plot(rawsmoothfig_ax, time, therapist, "k:", DisplayName="Therapist Raw", LineWidth=lw)
+    plot(rawsmoothfig_ax, time, csmoothed, "g", LineWidth=lw*1.5, DisplayName="Client Smoothed")
+    plot(rawsmoothfig_ax, time, tsmoothed, "k", LineWidth=lw*1.5, DisplayName="Therapist Smoothed")
+    hold(rawsmoothfig_ax, "off")
     
     ylim([downlim uplim])
     
@@ -108,21 +115,24 @@ featt = strcat(feat, "T");
     xlabel("Time in Seconds (s)")
     ylabel(feat)
     
-    set (gcf, 'position', [10 10 lengthplot heightplot], Color="w")
-    set (gca, fontname="Times New Roman")
+    set (rawsmoothfig, 'position', [10 10 lengthplot heightplot], Color="w")
+    set (rawsmoothfig_ax, fontname="Times New Roman")
     
-        export_fig(fullfile(outdir, clno + "_graph_" + feat + "_layered"), expformat1, "-r600");
+        exportgraphics(rawsmoothfig, fullfile(outdir, clno + "_graph_" + feat + "_layered." + expformat), Resolution=600)
+        close(rawsmoothfig)
 
 %% Plot Single and Combined Segmentations
 
 % Client Segmentation
     
-    figure(Visible = "off") 
-    hold on 
-    plot(time, csmoothed, "g", LineWidth=lw, DisplayName="Client Smoothed")
-    plot(extrema_c_time, extrema_c_values, "^g", MarkerSize=ms, DisplayName="Client Extrema") % add ^ for extrema
-    plot(bend_c_time, bend_c_values, "squareg", MarkerSize=ms, DisplayName="Client Bends") % add squares for bends
-    hold off
+    cseg = figure(Visible = "off"); 
+    cseg_ax = axes(cseg);
+
+    hold(cseg_ax, "on")
+    plot(cseg_ax, time, csmoothed, "g", LineWidth=lw, DisplayName="Client Smoothed")
+    plot(cseg_ax, extrema_c_time, extrema_c_values, "^g", MarkerSize=ms, DisplayName="Client Extrema") % add ^ for extrema
+    plot(cseg_ax, bend_c_time, bend_c_values, "squareg", MarkerSize=ms, DisplayName="Client Bends") % add squares for bends
+    hold(cseg_ax, "off")
     
     ylim([downlim uplim])
     
@@ -131,19 +141,22 @@ featt = strcat(feat, "T");
     ylabel(feat)
     
     legend (Location="northeast")
-    set (gcf, 'position', [10 10 lengthplot heightplot], Color="w")
-    set (gca, fontname="Times New Roman")
+    set (cseg, 'position', [10 10 lengthplot heightplot], Color="w")
+    set (cseg_ax, fontname="Times New Roman")
     
-        export_fig(fullfile(outdir, clno + "_graph_" + feat + "_bv_client"), expformat1, "-r600");
+        exportgraphics(cseg, fullfile(outdir, clno + "_graph_" + feat + "_segmented_client." + expformat), Resolution=600)
+        close(cseg)
 
 % Therapist Segmentation
 
-    figure(Visible = "off")
-    hold on 
-    plot(time, tsmoothed, "k", LineWidth=lw, DisplayName="Therapist Smoothed")
-    plot(extrema_t_time, extrema_t_values, "^k", MarkerSize=ms, DisplayName="Therapist Extrema") % add ^ for extrema
-    plot(bend_t_time, bend_t_values, "squarek", MarkerSize=ms, DisplayName="Therapist Bends") % add squares for bends
-    hold off
+    tseg = figure(Visible = "off");
+    tseg_ax = axes(tseg);
+
+    hold(tseg_ax, "on")
+    plot(tseg_ax, time, tsmoothed, "k", LineWidth=lw, DisplayName="Therapist Smoothed")
+    plot(tseg_ax, extrema_t_time, extrema_t_values, "^k", MarkerSize=ms, DisplayName="Therapist Extrema") % add ^ for extrema
+    plot(tseg_ax, bend_t_time, bend_t_values, "squarek", MarkerSize=ms, DisplayName="Therapist Bends") % add squares for bends
+    hold(tseg_ax, "off")
     
     % xticks(ticks)
     ylim([downlim uplim])
@@ -153,36 +166,40 @@ featt = strcat(feat, "T");
     ylabel(feat)
     
     legend (Location="northeast")
-    set (gcf, 'position', [10 10 lengthplot heightplot], Color="w")
-    set (gca, fontname="Times New Roman")
+    set (tseg, 'position', [10 10 lengthplot heightplot], Color="w")
+    set (tseg_ax, fontname="Times New Roman")
     
-        export_fig(fullfile(outdir, clno + "_graph_" + feat + "_bv_therapist"), expformat1, "-r600");
+        exportgraphics(tseg, fullfile(outdir, clno + "_graph_" + feat + "_segmented_therapist." + expformat), Resolution=600)
+        close(tseg)
 
 % Combined (including crossings)
 
-    figure(Visible = "off") 
-    hold on 
-    plot(time, csmoothed, "g", LineWidth=lw, DisplayName="Client Smoothed")
-    plot(extrema_c_time, extrema_c_values, "^g", MarkerSize=ms, DisplayName="Client Extrema") % add ^ for extrema
-    plot(bend_c_time, bend_c_values, "squareg", MarkerSize=ms, DisplayName="Client Bends") % add squares for bends
+    combinedfig = figure(Visible = "off"); 
+    combinedfig_ax = axes(combinedfig);
 
-    plot(time, tsmoothed, "k", LineWidth=lw, DisplayName="Therapist Smoothed")
-    plot(extrema_t_time, extrema_t_values, "^k", MarkerSize=ms, DisplayName="Therapist Extrema") % add ^ for extrema
-    plot(bend_t_time, bend_t_values, "squarek", MarkerSize=ms, DisplayName="Therapist Bends") % add squares for bends
+    hold(combinedfig_ax, "on") 
+    plot(combinedfig_ax, time, csmoothed, "g", LineWidth=lw, DisplayName="Client Smoothed")
+    plot(combinedfig_ax, extrema_c_time, extrema_c_values, "^g", MarkerSize=ms, DisplayName="Client Extrema") % add ^ for extrema
+    plot(combinedfig_ax, bend_c_time, bend_c_values, "squareg", MarkerSize=ms, DisplayName="Client Bends") % add squares for bends
+
+    plot(combinedfig_ax, time, tsmoothed, "k", LineWidth=lw, DisplayName="Therapist Smoothed")
+    plot(combinedfig_ax, extrema_t_time, extrema_t_values, "^k", MarkerSize=ms, DisplayName="Therapist Extrema") % add ^ for extrema
+    plot(combinedfig_ax, bend_t_time, bend_t_values, "squarek", MarkerSize=ms, DisplayName="Therapist Bends") % add squares for bends
     
-    plot(crossings_times, crossings_values, "or", MarkerSize = ms, DisplayName = "Crossings")
+    plot(combinedfig_ax, crossings_times, crossings_values, "or", MarkerSize = ms, DisplayName = "Crossings")
 
-    hold off
+    hold(combinedfig_ax, "off")
     
     ylim([downlim uplim])
     title("Client & Therapist Segmentation" + " (C = " + sum(nnz([extrema_c_idx; bend_c_idx])) + ", T = " + sum(nnz([extrema_t_idx; bend_t_idx])) + ")")
     xlabel("Time in Seconds (s)")
     ylabel(feat)
     legend (Location="northeast")
-    set (gcf, 'position', [10 10 lengthplot heightplot], Color="w")
-    set (gca, fontname="Times New Roman")
+    set (combinedfig, 'position', [10 10 lengthplot heightplot], Color="w")
+    set (combinedfig_ax, fontname="Times New Roman")
     
-        export_fig(fullfile(outdir, clno + "_graph_" + feat + "_bv_both"), expformat1, "-r600");  
+        exportgraphics(combinedfig, fullfile(outdir, clno + "_graph_" + feat + "_segmented_both." + expformat), Resolution=600)
+        close(combinedfig)
 
 end
 
