@@ -182,72 +182,7 @@ featt = strcat(feat, "T");
     set (gcf, 'position', [10 10 lengthplot heightplot], Color="w")
     set (gca, fontname="Times New Roman")
     
-        export_fig(fullfile(outdir, clno + "_graph_" + feat + "_bv_both"), expformat1, "-r600");
-   
-% Combined Graphics
-
-segmentation = figure (Position=[1 1 lengthplot heightplot/2*3], Visible = "off");
-tile=tiledlayout(5, 2, TileSpacing="compact", Padding="compact");
-
-nexttile ([2 1])
-
-% Client
-
-    hold on
-    plot(time, csmoothed, "g", LineWidth=lw, DisplayName="Client Smoothed")
-    plot(extrema_c_time, extrema_c_values, "^g", MarkerSize=ms, DisplayName="Client Extrema") % add ^ for extrema
-    plot(bend_c_time, bend_c_values, "squareg", MarkerSize=ms, DisplayName="Client Bends") % add squares for bends
-    title ("Client")
-    ylabel(feat)
-    fontname("Times New Roman")
-    xlabel("Time in Seconds (s)")
-    legend(Location="northeast")
-    ylim([downlim uplim])
-    hold off
-    
-    nexttile ([2 1])
-
-% Therapist
- 
-    hold on
-    plot(time, tsmoothed, "k", LineWidth=lw, DisplayName="Therapist Smoothed")
-    plot(extrema_t_time, extrema_t_values, "^k", MarkerSize=ms, DisplayName="Therapist Extrema") % add ^ for extrema
-    plot(bend_t_time, bend_t_values, "squarek", MarkerSize=ms, DisplayName="Therapist Bends") % add squares for bends
-    title ("Therapist")
-    ylabel(feat)
-    xlabel("Time in Seconds (s)")
-    legend(Location="northeast")
-    fontname("Times New Roman")
-    ylim([downlim uplim])
-    hold off
-    
-    nexttile ([3 2]);
-
-% Client and Therapist
-
-    hold on
-
-    plot(time, csmoothed, "g", LineWidth=lw, DisplayName="Client Smoothed")
-    plot(extrema_c_time, extrema_c_values, "^g", MarkerSize=ms, DisplayName="Client Extrema") % add ^ for extrema
-    plot(bend_c_time, bend_c_values, "squareg", MarkerSize=ms, DisplayName="Client Bends") % add squares for bends
-
-    plot(time, tsmoothed, "k", LineWidth=lw, DisplayName="Therapist Smoothed")
-    plot(extrema_t_time, extrema_t_values, "^k", MarkerSize=ms, DisplayName="Therapist Extrema") % add ^ for extrema
-    plot(bend_t_time, bend_t_values, "squarek", MarkerSize=ms, DisplayName="Therapist Bends") % add squares for bends
-
-    plot(crossings_times, crossings_values, "or", MarkerSize = ms, DisplayName = "Crossings")
-
-    legend(Location="northeast")
-    title ("Client & Therapist")
-    ylabel(feat)
-    xlabel("Time in Seconds (s)")
-    fontname("Times New Roman")
-    ylim([downlim uplim])
-    hold off
-    
-    title(tile, "Segmentation Process")
-    
-        exportgraphics(segmentation, fullfile(outdir, clno + "_graph_" + feat + "_bv_stacked.png"), Resolution=600)        
+        export_fig(fullfile(outdir, clno + "_graph_" + feat + "_bv_both"), expformat1, "-r600");  
 
 end
 
