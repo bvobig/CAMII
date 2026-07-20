@@ -11,7 +11,10 @@ function [results] = camii(midi_file, options)
         options.export_types (1,1) logical = false
         options.export_results (1,1) logical = false
 
-        options.BufferSize (1,1) double = 25
+        options.buffer_size (1,1) double = 25
+        options.zero_threshold (1,1) double = 0.01
+        options.partner_threshold (1,1) double = 0.2        
+        
         options.ExportFormat string{mustBeMember(options.ExportFormat, ["png", "jpg", "eps", "svg"])} = "png"
 
         options.GraphFeatures string{mustBeMember(options.GraphFeatures, ["All","AC","Articulation","Density", "Dissonance","Duration","Majorness", "MeanPitch","MeanVelocity","Minorness", "StandardPitchDeviation","Tempo","Tonality"])} = "All"
@@ -112,11 +115,11 @@ function [data, segments, feats, stats, types, typestotal] = analysis (mttbdata,
 
     data = preproc(mttbdata, 1); disp("1/7 Preprocessing finished")% preprocess mttb data
     segments = segment_data(data, 1); disp("2/7 segmentation finished") % segment data (data, bend_threshold)
-    feats = featcalc(data, segments, 0.01); disp("3/7 Feature Calculation finished") % calculate features (data, segments, zerothresh)
+    feats = featcalc(data, segments, options.zero_threshold); disp("3/7 Feature Calculation finished") % calculate features (data, segments, zerothresh)
     [obsc, obst] = feat2obs (feats); disp("4/7 Observation Transformation finished") % convert features into observations
     [predsc, predst] = applymodel (model, obsc, obst); disp("5/7 Interaction Type Prediction finished") % apply model
-    stats = statscalc (obsc, obst, predsc, predst, data, 1, options.BufferSize); disp("6/7 Stat Calculation finished") % calculate stats %buffer*2 is frame in .1s (default = 25)
-    [types, typestotal] = analyseinteractions(stats, data, 0.2);disp("7/7 Interaction Analysis finished") % partnerthresh (default = 0.2) = percentual difference between a.i and c.i to detect Partner gradient
+    stats = statscalc (obsc, obst, predsc, predst, data, 1, options.buffer_size); disp("6/7 Stat Calculation finished") % calculate stats %buffer*2 is frame in .1s (default = 25)
+    [types, typestotal] = analyseinteractions(stats, data, options.partner_threshold);disp("7/7 Interaction Analysis finished") % partnerthresh (default = 0.2) = percentual difference between a.i and c.i to detect Partner gradient
 
 beep on; beep; disp ("Calculation Task finished");
 
