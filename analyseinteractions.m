@@ -1,6 +1,5 @@
 function [types, typestotal] = analyseinteractions (stats, data, partnerthresh)
 %assigns interaction type distribution to role gradients
-
 %% Define Starting and Looping Indicators
 varnames=["AC", "Articulation", "Density", "Dissonance", "Duration", "Majorness", "MeanPitch", "MeanVelocity", "Minorness", "StandardPitchDeviation", "Tempo", "Tonality"];
 ct=["c","t"];
@@ -85,14 +84,16 @@ types.t.(var)(soloidxt)=categorical("Solo");
 % comparable -- same fix as the statscalc.m error from before.)
 allcatnames = ["Solo","none",catnames];
 [tf_c, grp_c] = ismember(string(types.c.(var)), allcatnames);
-counts_c = accumarray(grp_c(tf_c), 1, [numel(allcatnames), 1]);
+subs_c = grp_c(tf_c);
+counts_c = accumarray(subs_c(:), 1, [numel(allcatnames), 1]); % (:) as a defensive measure -- see the statscalc.m accumarray fix
 csolo=counts_c(1); cnone=counts_c(2);
 totaltypeamountc= height(types.c.(var)) - csolo - cnone; % total c positions that are not none or Solo, inter-actions
 cdependent=counts_c(3)/totaltypeamountc; capproach=counts_c(4)/totaltypeamountc; cfollower=counts_c(5)/totaltypeamountc;
 cpartner=counts_c(6)/totaltypeamountc; cleader=counts_c(7)/totaltypeamountc; cresister=counts_c(8)/totaltypeamountc; cneutral=counts_c(9)/totaltypeamountc;
 ctypestotal = array2table([cdependent, capproach, cfollower, cpartner, cleader, cresister, cneutral], "VariableNames", catnames);
 [tf_t, grp_t] = ismember(string(types.t.(var)), allcatnames);
-counts_t = accumarray(grp_t(tf_t), 1, [numel(allcatnames), 1]);
+subs_t = grp_t(tf_t);
+counts_t = accumarray(subs_t(:), 1, [numel(allcatnames), 1]); % (:) as a defensive measure -- see the statscalc.m accumarray fix
 tsolo=counts_t(1); tnone=counts_t(2);
 totaltypeamountt= height(types.t.(var)) - tsolo - tnone; % total t positions that are not none or Solo, inter-actions
 tdependent=counts_t(3)/totaltypeamountt; tapproach=counts_t(4)/totaltypeamountt; tfollower=counts_t(5)/totaltypeamountt;
