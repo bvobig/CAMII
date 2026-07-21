@@ -1,9 +1,7 @@
 function preprocdata = preproc (mttbdata, smoothmethod)
-
-% PREPROC creates 4 datasets for original, smoothed and shortened alternatives. Further gives out statistical values for each feature and beginning/ends of play
+% preproc creates 4 datasets for original, smoothed and shortened alternatives. Further gives out statistical values for each feature and beginning/ends of play
 
 %% Restructuring
-
 % erase non-graph elements and reassign to impro
 impro=rmfield(mttbdata, ["sil1", "sil2"]);
 % transform struct into table
@@ -24,7 +22,6 @@ impro=movevars(impro, "Time", "Before", "Time_End");
 impro=impro(:, [1, 3:end]);
 % shorten impro table to only include impro.Time >= 0, Oliviers t_mean
 impro=impro(impro.Time>=0, :);
-
 % update varnames as there is no _Start or _End anymore
 varnames=varnames([1, 3:end]);
 
@@ -38,223 +35,108 @@ beginning(idxnan)=0;
 % calculate minimum of beginning indexes for total begin
 beginclient=find(beginning(:, 1), 1, "first");
 begintherapist=find(beginning(:, 2), 1, "first");
-beginidx=min(beginclient, begintherapist);
 % calculate minimum of ending indexes for total end
 endclient=find(beginning(:, 1), 1, "last");
 endtherapist=find(beginning(:, 2), 1, "last");
-endidx=max(endclient, endtherapist);
-
+if isempty(beginclient) || isempty(begintherapist)
+    warning('camii:preproc:SoloImprovisation', ...
+        'Client or Therapist never plays in this improvisation -- treating it as a solo improvisation for begin/end-of-play detection.')
+end
+% concatenating (rather than min/max on two separate arguments) ensures
+% begin/endidx still resolve correctly when one actor never plays, i.e.
+% one of the four find() results above is empty
+beginidx=min([beginclient, begintherapist]);
+endidx=max([endclient, endtherapist]);
 % cut improvisation data at begin and end of total play
 improshort=impro(beginidx:endidx, :);
 
 %% Data Smoothing
 % create new table for smoothed Data with moving mean of 20ms, each for normal and short
-
 switch smoothmethod
-    case 1 % uniform smoothing by 20frame movmean
+case 1 % uniform smoothing by 20frame movmean
         smoothimpro=smoothdata(impro(:, 3:end),"movmean",20);
         smoothimproshort=smoothdata(improshort(:, 3:end), "movmean",20);
-    case 2 % individual smoothing by Smoothingfactor = 0.1
+case 2 % individual smoothing by Smoothingfactor = 0.1
         smoothimpro=smoothdata(impro(:, 3:end),"movmean",SmoothingFactor=0.1);
         smoothimproshort=smoothdata(improshort(:, 3:end), "movmean",SmoothingFactor=0.1);
+otherwise
+        error('camii:preproc:InvalidSmoothMethod', ...
+            'Invalid smoothmethod (%s). Valid options are 1 (fixed 20-frame movmean) or 2 (movmean with SmoothingFactor=0.1).', mat2str(smoothmethod))
 end
 
 %% NaN Correction
 % Insert original impro NaN Values in smoothimpro and smoothimproshort
 % Convert Variable names for input to array2table
 varnameschar=convertStringsToChars(varnames);
-
-% for normal impro
-    % Change data type of impro and smoothimpro table for isnan calculation
-    improarray=table2array(impro);
-    smoothimproarray=table2array(smoothimpro);
-    % identify original NaN values in impro Table, excluding time
-    nanidx=isnan(improarray(:, 3:end));
-    % Assign original NaN values to relevant spaces in smoothimpro
-    smoothimproarray(nanidx)=NaN;
-    % concatenate original time values with smoothed and adapted data
-    smoothimproarray=[impro.Time, impro.Time_Start, smoothimproarray];
-    % Create new table with adjusted data and original variable names
-    smoothimpro=array2table(smoothimproarray, VariableNames=varnameschar);
-
-% for short impro
-    % Change data type of impro and smoothimpro table for isnan calculation
-    improshortarray=table2array(improshort);
-    smoothimproshortarray=table2array(smoothimproshort);
-    % identify original NaN values in impro Table, excluding time
-    nanidxshort=isnan(improshortarray(:, 3:end));
-    % Assign original NaN values to relevant spaces in smoothimpro
-    smoothimproshortarray(nanidxshort)=NaN;
-    % concatenate original time values with smoothed and adapted data
-    smoothimproshortarray=[improshort.Time, improshort.Time_Start, smoothimproshortarray];
-    % Create new table with adjusted data and original variable names
-    smoothimproshort=array2table(smoothimproshortarray, VariableNames=varnameschar);
+% for normal impro: reinsert NaN gaps that smoothdata interpolated across
+smoothimpro=restoreNaNs(impro, smoothimpro, varnameschar);
+% for short impro: same correction
+smoothimproshort=restoreNaNs(improshort, smoothimproshort, varnameschar);
 
 %% Individual Statistics
 % Calculate Individual Statistical Data for each Feature
-% Range 
-    % calculate and rename range
+% Range
+% calculate and rename range
     improranges=range(impro(:, 3:end));
-    improranges=renamevars(improranges, 1:24, (varnames(3:end)));
-    % smoothed
+    improranges=renamevars(improranges, 1:width(improranges), (varnames(3:end)));
+% smoothed
     improrangessmooth=range(smoothimpro(:, 3:end));
-    improrangessmooth=renamevars(improrangessmooth, 1:24, (varnames(3:end)));
-
-% Mean 
-    % calculate and rename mean
+    improrangessmooth=renamevars(improrangessmooth, 1:width(improrangessmooth), (varnames(3:end)));
+% Mean
+% calculate and rename mean
     impromeans=mean(impro(:, 3:end), "omitmissing");
-    impromeans=renamevars(impromeans, 1:24, (varnames(3:end)));
-    % smoothed
+    impromeans=renamevars(impromeans, 1:width(impromeans), (varnames(3:end)));
+% smoothed
     impromeanssmoothed=mean(smoothimpro(:, 3:end), "omitmissing");
-    impromeanssmoothed=renamevars(impromeanssmoothed, 1:24, (varnames(3:end)));
-
+    impromeanssmoothed=renamevars(impromeanssmoothed, 1:width(impromeanssmoothed), (varnames(3:end)));
 % Median
-    % calculate and rename median
+% calculate and rename median
     impromedian=median(impro(:, 3:end), "omitmissing");
-    impromedian=renamevars(impromedian, 1:24, (varnames(3:end)));
-    % smoothed
+    impromedian=renamevars(impromedian, 1:width(impromedian), (varnames(3:end)));
+% smoothed
     impromediansmoothed=median(smoothimpro(:, 3:end), "omitmissing");
-    impromediansmoothed=renamevars(impromediansmoothed, 1:24, (varnames(3:end)));
-
+    impromediansmoothed=renamevars(impromediansmoothed, 1:width(impromediansmoothed), (varnames(3:end)));
 % Standard Deviation
-    % calculate and rename std, w in this case is 1 because all values are
-    % present, set to 0 for estimation of mean by n-1 to compensate for using
-    % estimated values as in a sample set
+% calculate and rename std, w in this case is 1 because all values are
+% present, set to 0 for estimation of mean by n-1 to compensate for using
+% estimated values as in a sample set
     improstd=std(impro(:, 3:end), 1, "omitmissing");
-    improstd=renamevars(improstd, 1:24, (varnames(3:end)));
-    % smoothed
+    improstd=renamevars(improstd, 1:width(improstd), (varnames(3:end)));
+% smoothed
     improstdsmoothed=std(smoothimpro(:, 3:end), 1, "omitmissing");
-    improstdsmoothed=renamevars(improstdsmoothed, 1:24, (varnames(3:end)));
+    improstdsmoothed=renamevars(improstdsmoothed, 1:width(improstdsmoothed), (varnames(3:end)));
 
-%% Difference Calculation
+    %% Difference Calculation
 % Calculate FeatDelta between Players (forward)
 % calculate difference between the two players for original data
 % client minus therapist (positive values mean client is above therapist, negative values mean client is below therapist)
-
 % create vector for FeatDelta Names
 diffvars=["ACDiff", "ArticulationDiff", "DensityDiff", "DissonanceDiff", "DurationDiff", "MajornessDiff", "MeanPitchDiff", "MeanVelocityDiff", "MinornessDiff", "StandardPitchDeviationDiff", "TempoDiff", "TonalityDiff"];
-
 % Raw Impro Data
-% preallocation
-difference=zeros(height(impro), 1);
 difftable=table;
-
 count=1;
-
 for i=3:2:width(impro)
-    for n=1:height(impro)
-        difference(n)=impro.(i)(n)-impro.(i+1)(n);
-    end
-    difftable.(diffvars(count))=difference;
+    difftable.(diffvars(count))=impro.(i)-impro.(i+1); % vectorised column subtraction (was a per-row loop)
     count=count+1;
 end
-
 % Smoothed Data
-% preallocation
-differencesmooth=zeros(height(impro), 1);
-count=1;
 difftablesmooth=table;
-
+count=1;
 for i=3:2:width(smoothimpro)
-    for n=1:height(smoothimpro)
-        differencesmooth(n)=smoothimpro.(i)(n)-smoothimpro.(i+1)(n);
-    end
-    difftablesmooth.(diffvars(count))=differencesmooth;
+    difftablesmooth.(diffvars(count))=smoothimpro.(i)-smoothimpro.(i+1); % vectorised column subtraction (was a per-row loop)
     count=count+1;
 end
 
 %% Common Statistics
-% Calculate Common Feature Statistics
-% Range
-    % Raw Data
-    % preallocate
-    rangetotalpre=zeros(1, 12);
-    count=1;
-    for y=3:2:25
-        rangetotalpre(count)=range([impro.(y);impro.(y+1)]);
-        count=count+1;
-    end
-    % tranform data into table
-    rangetotal=array2table(rangetotalpre, VariableNames=featnames);
-
-    % Smoothed Data
-    rangetotalpresmoothed=zeros(1, 12);
-    count=1;
-    for y=3:2:25
-        rangetotalpresmoothed(count)=range([smoothimpro.(y);smoothimpro.(y+1)]);
-        count=count+1;
-    end
-    % tranform data into table
-    rangetotalsmoothed=array2table(rangetotalpresmoothed, VariableNames=featnames);
-
-% Mean
-    % Raw Data
-    % preallocate
-    meantotalpre=zeros(1, 12);
-    count=1;
-    for y=3:2:25
-        meantotalpre(count)=mean([impro.(y);impro.(y+1)], "omitmissing");
-        count=count+1;
-    end
-    % tranform data into table
-    meantotal=array2table(meantotalpre, VariableNames=featnames);
-    
-    % Smoothed Data
-    % preallocate
-    meantotalpresmoothed=zeros(1, 12);
-    count=1;
-    for y=3:2:25
-        meantotalpresmoothed(count)=mean([smoothimpro.(y);smoothimpro.(y+1)], "omitmissing");
-        count=count+1;
-    end
-    % tranform data into table
-    meantotalsmoothed=array2table(meantotalpresmoothed, VariableNames=featnames);
-
-% Median
-    % Raw Data
-    % preallocate
-    mediantotalpre=zeros(1, 12);
-    count=1;
-    for y=3:2:25
-        mediantotalpre(count)=median([impro.(y);impro.(y+1)], "omitmissing");
-        count=count+1;
-    end
-    % tranform data into table
-    mediantotal=array2table(mediantotalpre, VariableNames=featnames);
-    
-    % Smoothed Data
-    % preallocate
-    mediantotalpresmoothed=zeros(1, 12);
-    count=1;
-    for y=3:2:25
-        mediantotalpresmoothed(count)=median([smoothimpro.(y);smoothimpro.(y+1)], "omitmissing");
-        count=count+1;
-    end
-    % tranform data into table
-    mediantotalsmoothed=array2table(mediantotalpresmoothed, VariableNames=featnames);
-
-% Standard Deviation
-    % Raw Data
-    % preallocate
-    stdtotalpre=zeros(1, 12);
-    count=1;
-    for y=3:2:25
-        stdtotalpre(count)=std([impro.(y);impro.(y+1)], 1);
-        count=count+1;
-    end
-    % tranform data into table
-    stdtotal=array2table(stdtotalpre, VariableNames=featnames);
-    
-    % Smoothed Data
-    % preallocate
-    stdtotalpresmoothed=zeros(1, 12);
-    count=1;
-    for y=3:2:25
-        stdtotalpresmoothed(count)=std([smoothimpro.(y);smoothimpro.(y+1)], 1);
-        count=count+1;
-    end
-    % tranform data into table
-    stdtotalsmoothed=array2table(stdtotalpresmoothed, VariableNames=featnames);
+% Calculate Common Feature Statistics (Client+Therapist combined per feature)
+rangetotal          = combinedStat(impro, featnames, @range);
+rangetotalsmoothed  = combinedStat(smoothimpro, featnames, @range);
+meantotal           = combinedStat(impro, featnames, @(x) mean(x, "omitmissing"));
+meantotalsmoothed   = combinedStat(smoothimpro, featnames, @(x) mean(x, "omitmissing"));
+mediantotal         = combinedStat(impro, featnames, @(x) median(x, "omitmissing"));
+mediantotalsmoothed = combinedStat(smoothimpro, featnames, @(x) median(x, "omitmissing"));
+stdtotal            = combinedStat(impro, featnames, @(x) std(x, 1, "omitmissing"));
+stdtotalsmoothed    = combinedStat(smoothimpro, featnames, @(x) std(x, 1, "omitmissing"));
 
 %% Struct Gathering
 preprocdata.impro=impro;
@@ -285,3 +167,30 @@ preprocdata.stdtotal=stdtotal;
 preprocdata.stdtotalsmoothed=stdtotalsmoothed;
 preprocdata.short=improshort;
 preprocdata.smoothedshort=smoothimproshort;
+end
+
+function T = restoreNaNs(origT, smoothT, varnameschar)
+% Reinsert the NaN gaps present in origT (which smoothdata interpolates
+% across) back into smoothT, then reattach the Time/Time_Start columns
+% from origT and rename to match. origT has [Time, Time_Start, features...],
+% smoothT has only [features...] (as produced by smoothdata on origT(:,3:end)).
+origArray = table2array(origT);
+smoothArray = table2array(smoothT);
+nanIdx = isnan(origArray(:, 3:end));
+smoothArray(nanIdx) = NaN;
+smoothArray = [origT.Time, origT.Time_Start, smoothArray];
+T = array2table(smoothArray, VariableNames=varnameschar);
+end
+
+function statTable = combinedStat(T, featnames, statFcn)
+% Apply statFcn to each feature's combined Client+Therapist column pair
+% (e.g. columns 3&4, 5&6, ... of T) and return a 1-row table with one
+% column per feature, named after featnames.
+nFeat = numel(featnames);
+vals = zeros(1, nFeat);
+for k = 1:nFeat
+    y = 2*k + 1; % first feature column is column 3
+    vals(k) = statFcn([T.(y); T.(y+1)]);
+end
+statTable = array2table(vals, VariableNames=featnames);
+end

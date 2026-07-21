@@ -10,26 +10,25 @@ end
 %% normalize scale so the angle is comparable regardless of this
 % feature's original units/magnitude
 switch scale_method
-    case "zscore"
+case "zscore"
         s = std(data, 'omitnan');
-        if s == 0 || isnan(s)
+if s == 0 || isnan(s)
             s = 1; % constant/degenerate series -> no scaling needed
-        end
+end
         data_scaled = (data - mean(data, 'omitnan')) / s;
-    case "mad"
+case "mad"
         m = mad(data, 1); % median absolute deviation
-        if m == 0 || isnan(m)
+if m == 0 || isnan(m)
             m = 1;
-        end
+end
         data_scaled = (data - median(data, 'omitnan')) / m;
-    case "none"
+case "none"
         data_scaled = data;
 end
 
 %% calculate first derivation (assumes equidistant sampling, dx = 1)
 slopes = [NaN; diff(data_scaled)];
 n = height(slopes);
-
 % segment angle in degrees: atand is defined everywhere (even at
 % slope=0), unlike the division used in the factor approach
 theta = atand(slopes);
@@ -39,33 +38,26 @@ extrema_idx = sort([find(islocalmax(data, "FlatSelection", "all")); ...
                      find(islocalmin(data, "FlatSelection", "all"))]);
 is_extremum = false(n, 1);
 is_extremum(extrema_idx) = true;
+% angle difference between consecutive segments 
 
-% angle difference between consecutive segments (only where there is no
-% direction reversal -> "continuous" behavior change within the same
-% trend direction)
 delta_theta = NaN(n, 1);
-for i = 1:n-1
-    if ~is_extremum(i)
-        delta_theta(i) = theta(i+1) - theta(i);
-    end
-end
+stepMask = ~is_extremum(1:n-1);
+stepDelta = theta(2:n) - theta(1:n-1);
+delta_theta([stepMask; false]) = stepDelta(stepMask);
 
 %% extract relevant slopes (threshold_angle_deg default is 15)
 bend = abs(delta_theta) > threshold_angle_deg;
 bend_idx = find(bend);
 
 %% detect direction based on slope after idx value
+% (vectorised: was a per-bend loop; guards the same idx+1<=n boundary
+% check via a logical mask instead of an if inside the loop)
 direction = NaN(numel(bend_idx), 1);
-for b = 1:numel(bend_idx)
-    idx = bend_idx(b);
-    if idx + 1 <= n
-        direction(b) = sign(slopes(idx + 1));
-    end
-end
+validNext = (bend_idx + 1) <= n;
+direction(validNext) = sign(slopes(bend_idx(validNext) + 1));
 
 %% add segmentation type
 bend_table = table(bend_idx, direction, 'VariableNames', {'idx', 'direction'});
 bend_table.type(1:height(bend_table)) = "bend";
 bend_table = bend_table(:, {'idx', 'type', 'direction'});
-
 end
