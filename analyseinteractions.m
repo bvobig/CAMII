@@ -1,157 +1,104 @@
 function [types, typestotal] = analyseinteractions (stats, data, partnerthresh)
-
 %assigns interaction type distribution to role gradients
 
 %% Define Starting and Looping Indicators
-
 varnames=["AC", "Articulation", "Density", "Dissonance", "Duration", "Majorness", "MeanPitch", "MeanVelocity", "Minorness", "StandardPitchDeviation", "Tempo", "Tonality"];
 ct=["c","t"];
-
+% category names used both for the per-row classification below and for
+% the total-percentage counting further down
+catnames = ["Dependent","Approach","Follower","Partner","Leader","Resister","Neutral"];
 % variable indicator
 for t=1:12
     var=varnames(t);
- 
 % player indicator
 for p = 1:2
     player=ct(p);
- 
-
 %% Start Assignment Loop
-
-for y=1:height(stats.(player).(var).timestable)
-if ~isnan(stats.(player).(var).percenttable3{y, 1})
-[~, promidx]=max(stats.(player).(var).percenttable3(y, :), [], 2);
- 
-if promidx{:, :} == 1 % Affirmative
-  
-    [deltaval, deltaidx] = max(stats.(player).(var).percenttable2{y, 1:2}, [], 2);
-   
-    if deltaidx==2 % if not in proximity
-        interactiontype(y)=categorical("Approach"); % (Approaching Follower), can be changed again afterwards
-   
-    else % if in proximity
-        proxdiff=abs(deltaval-(stats.(player).(var).percenttable2{y, 5})); % calculate difference between ai and ci
-        if proxdiff <= partnerthresh % if difference of ci and ai is below partnerthresh, partnerthresh = percentual difference between a.i and c.i to detect Partner gradient
-            interactiontype(y)=categorical("Partner"); % (Subordinate)
-       
-        else % if difference between ci and ai is above partnerthresh
-            dom=stats.(player).(var).percenttable2{y,1}>=0.95; % calculate if ai is used more than 95% 
-            if dom==1 % if ai is dominant
-                interactiontype(y)=categorical("Dependent");
-           
-            else % if ai is not dominant
-                interactiontype(y)=categorical("Follower"); % (Close)
-            end
-        end
-    end
-
-elseif promidx{:, :} == 2 % Neutral
-
-    [deltaval, deltaidx] = max(stats.(player).(var).percenttable2{y, 3:4}, [], 2);
-  
-    if deltaidx == 1 % if there is proximity
-       
-        [otherval, otheridx] = max(stats.(player).(var).percenttable1{y, 7:9}, [], 2);
-       
-        if otheridx==1 % if other is a
-            interactiontype(y)=categorical("Partner"); % (Welcoming) % LNdW Partner / Original: Neutral
-        elseif otheridx==2 % if other is n
-            interactiontype(y)=categorical("Partner"); % (Connected)
-        elseif otheridx==3 % if other is c
-            interactiontype(y)=categorical("Partner"); % (Withstand) % LNdW Partner / Original: Neutral
-        end
-    
-    else % if no proximity
-      
-        [otherval, otheridx] = max(stats.(player).(var).percenttable1{y, 10:12}, [], 2);
-
-        if otheridx==1 % if other is a
-            interactiontype(y)=categorical("Resister"); % (Welcoming)
-        elseif otheridx==2 % if other is n
-            interactiontype(y)=categorical("Resister"); % (Neutral)
-        elseif otheridx==3 % if other is c
-            interactiontype(y)=categorical("Resister"); % (Withstand)
-        end
-    end
-%% 
-elseif promidx{:, :} == 3 % Contradictive
-
-    [deltaval, deltaidx] = max(stats.(player).(var).percenttable2{y, 5:6}, [], 2);
-
-    if deltaidx==2 % if not in proximity
-        interactiontype(y)=categorical("Resister"); % (active)
-   
-    else % if in proximity
-        proxdiff=abs(deltaval-(stats.(player).(var).percenttable2{y, 1})); % calculate difference between ai and ci
-        if proxdiff <= partnerthresh % if difference of ci and ai is below partnerthresh
-            interactiontype(y)=categorical("Partner"); % (Superior)
-       
-        else % if difference between ci and ai is above partnerthresh
-            interactiontype(y)=categorical("Leader");
-        end
-    end
+% (vectorised: every row's classification only depends on that row's own
+% percenttable1/2/3 values, no row-to-row dependency, so the whole
+% per-row loop collapses to a handful of column-wise max() calls plus
+% masked assignment. See chat explanation for how this maps to the
+% original if/elseif tree.)
+n = height(stats.(player).(var).timestable);
+pt2 = stats.(player).(var).percenttable2{:, :}; % columns: ai, aii, ni, nii, ci, cii
+pt3 = stats.(player).(var).percenttable3{:, :}; % columns: a, n, c
+validmask = ~isnan(pt3(:, 1));
+[~, promidx] = max(pt3, [], 2); % 1=Affirmative, 2=Neutral, 3=Contradictive, matching a/n/c column order
+isA = validmask & promidx==1;
+isN = validmask & promidx==2;
+isCon = validmask & promidx==3;
+interactiontype = repmat(categorical("none"), n, 1); % default for rows that fail validmask
+% Affirmative
+[deltaval_a, deltaidx_a] = max(pt2(:, 1:2), [], 2); % ai vs aii
+notproximity_a = deltaidx_a==2;
+proxdiff_a = abs(deltaval_a - pt2(:, 5)); % vs ci
+inthresh_a = proxdiff_a <= partnerthresh;
+dom_a = pt2(:, 1) >= 0.95; % ai used more than 95%
+interactiontype(isA & notproximity_a) = categorical("Approach"); % (Approaching Follower), can be changed again afterwards
+interactiontype(isA & ~notproximity_a & inthresh_a) = categorical("Partner"); % (Subordinate)
+interactiontype(isA & ~notproximity_a & ~inthresh_a & dom_a) = categorical("Dependent");
+interactiontype(isA & ~notproximity_a & ~inthresh_a & ~dom_a) = categorical("Follower"); % (Close)
+% Neutral
+% NOTE: the original's "other" lookup (percenttable1 columns 7:9 /
+% 10:12) always resolved to the same category regardless of which of
+% its 3 branches matched (all 3 -> "Partner" in the proximity case, all
+% 3 -> "Resister" otherwise), so it never actually affected the result
+% -- omitted here as dead computation. One side effect: if that lookup's
+% source columns were ever all-NaN for a row, the original loop could
+% leave that row unclassified (categorical <undefined>) since none of
+% its if/elseif branches would fire; this version always resolves such
+% rows to Partner/Resister same as every other row, since it never
+% depended on that lookup to begin with.
+[~, deltaidx_n] = max(pt2(:, 3:4), [], 2); % ni vs nii
+proximity_n = deltaidx_n==1;
+interactiontype(isN & proximity_n) = categorical("Partner"); % (Welcoming/Connected/Withstand)
+interactiontype(isN & ~proximity_n) = categorical("Resister"); % (Welcoming/Neutral/Withstand)
+% Contradictive
+[deltaval_c, deltaidx_c] = max(pt2(:, 5:6), [], 2); % ci vs cii
+notproximity_c = deltaidx_c==2;
+proxdiff_c = abs(deltaval_c - pt2(:, 1)); % vs ai
+inthresh_c = proxdiff_c <= partnerthresh;
+interactiontype(isCon & notproximity_c) = categorical("Resister"); % (active)
+interactiontype(isCon & ~notproximity_c & inthresh_c) = categorical("Partner"); % (Superior)
+interactiontype(isCon & ~notproximity_c & ~inthresh_c) = categorical("Leader");
+    types.(player).(var)=interactiontype; % already the correct column orientation, no transpose needed
 end
-%% 
-else 
-    interactiontype(y)=categorical("none");
-end
-    types.(player).(var)=interactiontype';
-end
-end
-
 %% Solo Passage Detection
-
 noneidxc=isnan(data.smoothed.(var + "C")); % identify none passages
 noneidxt=isnan(data.smoothed.(var + "T")); % identify none passages
-
 % apply noneidx to assign "none", therefore omit too early and too late
 % assignments due to analysis window
-
 types.c.(var)(noneidxc)=categorical ("none");
 types.t.(var)(noneidxt)=categorical ("none");
-
-soloidxc=~noneidxc+noneidxt==2;
-soloidxt=~noneidxt+noneidxc==2;
-
+% (cleaned up: same logic as before, written with & instead of the
+% +/==2 arithmetic idiom -- both only ever operate on 0/1 logicals, so
+% "sum equals 2" and "logical and" are the same thing here)
+soloidxc = ~noneidxc & noneidxt; % client plays, therapist doesn't
+soloidxt = ~noneidxt & noneidxc; % therapist plays, client doesn't
 types.c.(var)(soloidxc)=categorical("Solo"); % reassign "Solo" cat for solo passages for each player within feature cycle
 types.t.(var)(soloidxt)=categorical("Solo");
-
-clear noneidxc noneidxt soloidxt soloidxc
-
 %% Calculate total Percentages of Interaction Types for each Player
-
-csolo= nnz(types.c.(var) == "Solo"); % Solo
-cnone= nnz(types.c.(var) == "none"); % none
-
+% (vectorised: was 9 separate nnz(x==category) full-array scans per
+% player; now one grouped count via ismember+accumarray, same pattern
+% used earlier in statscalc.m. string() conversion up front since
+% categorical vs. a multi-element string array isn't directly
+% comparable -- same fix as the statscalc.m error from before.)
+allcatnames = ["Solo","none",catnames];
+[tf_c, grp_c] = ismember(string(types.c.(var)), allcatnames);
+counts_c = accumarray(grp_c(tf_c), 1, [numel(allcatnames), 1]);
+csolo=counts_c(1); cnone=counts_c(2);
 totaltypeamountc= height(types.c.(var)) - csolo - cnone; % total c positions that are not none or Solo, inter-actions
-cneutral= nnz(types.c.(var) == "Neutral") / totaltypeamountc; % Neutral
-cdependent= nnz(types.c.(var) == "Dependent") / totaltypeamountc; % Dependent
-cfollower= nnz(types.c.(var) == "Follower") / totaltypeamountc; % Follower
-cpartner= nnz(types.c.(var) == "Partner") / totaltypeamountc; % Partner
-cleader= nnz(types.c.(var) == "Leader") / totaltypeamountc; % Leader
-cresister= nnz(types.c.(var) == "Resister") / totaltypeamountc; % Resister
-capproach= nnz(types.c.(var) == "Approach") / totaltypeamountc; % Approach
-
-ctypestotal = array2table([cdependent, capproach, cfollower, cpartner, cleader, cresister, cneutral], "VariableNames", ["Dependent", "Approach", "Follower", "Partner", "Leader", "Resister", "Neutral"]);
-
-tsolo= nnz(types.t.(var) == "Solo"); % Solo
-tnone= nnz(types.t.(var) == "none"); % none
-
-totaltypeamountt= height(types.t.(var)) - tsolo - tnone; % total c positions that are not none or Solo, inter-actions
-tneutral= nnz(types.t.(var) == "Neutral") / totaltypeamountt; % Neutral
-tdependent= nnz(types.t.(var) == "Dependent") / totaltypeamountt; % Dependent
-tfollower= nnz(types.t.(var) == "Follower") / totaltypeamountt; % Follower
-tpartner= nnz(types.t.(var) == "Partner") / totaltypeamountt; % Partner
-tleader= nnz(types.t.(var) == "Leader") / totaltypeamountt; % Leader
-tresister= nnz(types.t.(var) == "Resister") / totaltypeamountt; % Resister
-tapproach= nnz(types.t.(var) == "Approach") / totaltypeamountt; % Approach
-
-ttypestotal = array2table([tdependent, tapproach, tfollower, tpartner, tleader, tresister, tneutral], "VariableNames", ["Dependent", "Approach", "Follower", "Partner", "Leader", "Resister", "Neutral"]);
-
+cdependent=counts_c(3)/totaltypeamountc; capproach=counts_c(4)/totaltypeamountc; cfollower=counts_c(5)/totaltypeamountc;
+cpartner=counts_c(6)/totaltypeamountc; cleader=counts_c(7)/totaltypeamountc; cresister=counts_c(8)/totaltypeamountc; cneutral=counts_c(9)/totaltypeamountc;
+ctypestotal = array2table([cdependent, capproach, cfollower, cpartner, cleader, cresister, cneutral], "VariableNames", catnames);
+[tf_t, grp_t] = ismember(string(types.t.(var)), allcatnames);
+counts_t = accumarray(grp_t(tf_t), 1, [numel(allcatnames), 1]);
+tsolo=counts_t(1); tnone=counts_t(2);
+totaltypeamountt= height(types.t.(var)) - tsolo - tnone; % total t positions that are not none or Solo, inter-actions
+tdependent=counts_t(3)/totaltypeamountt; tapproach=counts_t(4)/totaltypeamountt; tfollower=counts_t(5)/totaltypeamountt;
+tpartner=counts_t(6)/totaltypeamountt; tleader=counts_t(7)/totaltypeamountt; tresister=counts_t(8)/totaltypeamountt; tneutral=counts_t(9)/totaltypeamountt;
+ttypestotal = array2table([tdependent, tapproach, tfollower, tpartner, tleader, tresister, tneutral], "VariableNames", catnames);
 typestotal.c.(var)=ctypestotal;
 typestotal.t.(var)=ttypestotal;
-%% 
 end
 end
-%% 
-% 
