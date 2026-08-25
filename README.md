@@ -27,7 +27,6 @@ External dependencies:
 * mttblight2
 * MIDI Toolbox
 * InterX
-* export_fig
 
 ---
 
@@ -92,7 +91,6 @@ camii/
 ├── mttblight2/
 ├── external/
 │   ├── miditoolbox/
-│   ├── export_fig/
 │   └── InterX/
 ```
 
@@ -140,22 +138,6 @@ https://www.mathworks.com/matlabcentral/fileexchange/22441-curve-intersections
 
 ---
 
-## export_fig
-
-MATLAB figure export utility developed by Yair Altman and Oliver Woodford.
-
-Repository:
-
-https://github.com/altmany/export_fig
-
-Reference:
-
-Yair Altman (2026). export_fig (https://github.com/altmany/export_fig/releases/tag/v3.55), GitHub. Retrieved June 5, 2026.
-
-https://github.com/altmany/export_fig/releases/tag/v3.48
-
----
-
 # Usage
 
 CAMII can either be used through the standalone application or directly within MATLAB.
@@ -186,7 +168,7 @@ results = camii( ...
     export_graphs = true, ...
     GraphFeatures = ["MeanVelocity","Density"], ...
     ExportFormat = "png", ...
-    BufferSize = 25);
+    buffer_size = 10);
 ```
 
 ## Inputs
@@ -257,21 +239,53 @@ Avaliable features for analysis and export include all twelve features computabl
 
 ---
 
-## BufferSize
+### buffer_size
 
-The `BufferSize` parameter controls the slider length used for profile assignment.
+The `buffer_size` parameter controls the slider length used for profile assignment.
 
 The value is specified in units of 0.1 seconds.
 
 The default value is:
 
 ```matlab
-BufferSize = 25
+buffer_size = 25
 ```
 
 which corresponds to an effective analysis window of 5 seconds.
 
 Smaller values increase temporal sensitivity, while larger values produce more stable and global interaction profiles.
+
+---
+
+### partner_threshold
+
+The `partner_threshold` defines the maximum difference between Follower and Leader proportions allowed to detect the Partner gradient for the current analysis frame.
+
+The value is specified in decimal percentage, so that 0.2 represents a margin of 20%.
+
+The default value is:
+
+```matlab
+partner_threshold = 0.2
+```
+
+Smaller values treat the Partner gradient as more exclusive, while larger values allow more margin to detect the Partner gradient.
+
+---
+
+### zero_threshold
+
+The `zero_threshold` parameter defines the maximum individual intensity of movement to be registered still as neutral movement. Individual intensity is calculated as the percentage of the individual players range moved per second.
+
+The value is specified in decimal percentage.
+
+The default value is:
+
+```matlab
+zero_threshold = 0.01
+```
+
+which represents a maximum intensity of 1% per second allowed to be detected as neutral movement.
 
 ---
 
@@ -314,13 +328,14 @@ contains the overall distribution of interaction types across the improvisation.
 Instead of using the comprehensive workflow, CAMII can be applied using separate analysis and export functions.
 
 This approach allows repeated visualisation and export of results without recalculating the improvisation.
+The additional options are split for each function and can be applied as within the comprehensive function demonstrated above. 
 
 ---
 
 ## Analysis
 
 ```matlab
-results = camii_analysis(midi_file)
+results = camii_analysis(midi_file, options)
 ```
 
 Example:
@@ -328,7 +343,9 @@ Example:
 ```matlab
 results = camii_analysis( ...
     midi_file = "example.mid", ...
-    BufferSize = 25);
+    buffer_size = 25, ...
+    partner_threshold = 0.2, ...
+    zero_threshold = 0.01);
 ```
 
 The output contains all intermediate and final analysis results required for subsequent export operations.
@@ -338,7 +355,7 @@ The output contains all intermediate and final analysis results required for sub
 ## Export
 
 ```matlab
-camii_export(results)
+camii_export(results, options)
 ```
 
 Example:

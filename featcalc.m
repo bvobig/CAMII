@@ -1,5 +1,5 @@
 function feats = featcalc(data, segments, zerothresh)
-% calculates several features for each segment, needs preprocessed data and segments, provided by segmentsol or segmentsbv plus crossings as points of recontextualisation
+% calculates several features for each segment, needs preprocessed data and segments, provided by segment_data plus crossings as points of recontextualisation
 
 %% extract relevant data
 improdata=data.smoothed;
@@ -17,7 +17,8 @@ for f=1:height(feature_names)
 for a = 1:height(actor_names)
         actor = actor_names(a);
         var = strcat(feat, actor); %define data column from feat and actor
-%Create actor vectors and action type vectors
+
+% Create actor vectors and action type vectors
 % (fresh, correctly-sized arrays each iteration via repmat instead of
 % indexed-growth onto a possibly longer array left over from a previous
 % iteration -- this is what used to require clearvars to stay correct)
