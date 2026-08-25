@@ -2,7 +2,7 @@
 
 **Computational Assessment of Musical Interaction in Clinical Improvisation**
 
-[![DOI](https://zenodo.org/badge/1245913746.svg)](https://doi.org/10.5281/zenodo.20338644)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20338644.svg)](https://doi.org/10.5281/zenodo.20338644)
 
 CAMII is a MATLAB-based analysis framework developed from the theoretical model presented in Vobig (2025).
 
@@ -18,7 +18,7 @@ Optional export settings allow the generation of graphical and statistical repre
 
 The following software and toolboxes are required:
 
-* MATLAB (developed and tested with MATLAB R2024a)
+* MATLAB (developed and tested with MATLAB R2026a)
 * Statistics and Machine Learning Toolbox
 * Signal Processing Toolbox
 
@@ -34,7 +34,7 @@ External dependencies:
 
 CAMII has been developed and tested with:
 
-* MATLAB R2024a
+* MATLAB R2026a
 * Windows 11
 
 The standalone application is currently available for Windows systems only.
