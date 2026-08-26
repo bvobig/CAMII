@@ -24,17 +24,11 @@ function [results] = camii_analysis(midi_file, options)
     projectRoot = fileparts(mfilename('fullpath'));
     
     miditoolboxDir = fullfile(projectRoot,'external','miditoolbox');
-    exportFigDir   = fullfile(projectRoot,'external','export_figure');
     mttbLightDir   = fullfile(projectRoot,'mttblight');
     
     if ~isfolder(miditoolboxDir)
         error('camii:MissingDependency', ...
             'Folder external/miditoolbox is missing.')
-    end
-    
-    if ~isfolder(exportFigDir)
-        error('camii:MissingDependency', ...
-            'Folder external/export_figure is missing.')
     end
     
     if ~isfolder(mttbLightDir)
