@@ -6,7 +6,7 @@
 
 CAMII is a MATLAB-based analysis framework developed from the theoretical model presented in Vobig (2025).
 
-The software analyzes dyadic piano improvisations provided as MIDI files containing two performer channels. The data are preprocessed using a modified version of the Music Therapy Toolbox (MTTB), after which a supervised machine learning classifier and a manually defined decision tree are applied to identify and classify interaction patterns throughout the improvisation.
+The software analyses dyadic piano improvisations provided as MIDI files containing two performer channels. The data are preprocessed using a modified version of the Music Therapy Toolbox (MTTB), after which a supervised machine learning classifier and a manually defined decision tree are applied to identify and classify interaction patterns throughout the improvisation.
 
 The interaction analysis is based on the concepts of **Relational Direction** and **Relational Proximity**.
 

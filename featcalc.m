@@ -14,311 +14,279 @@ actor_names = ["C", "T"]';
 %% Initiate Single Actor Feature Calculations
 for f=1:height(feature_names)
     feat = feature_names(f);
-for a = 1:height(actor_names)
+    for a = 1:height(actor_names)
         actor = actor_names(a);
         var = strcat(feat, actor); %define data column from feat and actor
 
-% Create actor vectors and action type vectors
-% (fresh, correctly-sized arrays each iteration via repmat instead of
-% indexed-growth onto a possibly longer array left over from a previous
-% iteration -- this is what used to require clearvars to stay correct)
         actor_str = repmat(actor, height(segments.(feat).(actor)), 1);
         action_str = repmat("act", height(segments.(feat).(actor)), 1);
         cross_str = repmat("crossing", height(segments.(feat).crossings), 1);
 
-%% Single Actor Calculations
-% toown
-% transform action idx, times and actor to table
+        %% Single Actor Calculations
+
+        % toown
+        % transform action idx, times and actor to table
         times = improdata.Time(segments.(feat).(actor).idx);
         feature_table=table(segments.(feat).(actor).idx, segments.(feat).(actor).type, times , actor_str, action_str, VariableNames=["idx", "segtype", "time", "actor", "type"]);
-% calculate differences between own actions plus time until last action ends
+        % calculate differences between own actions plus time until last action ends
         feature_table_diff=table([diff(improdata.Time(feature_table.idx)); improdata.Time(data.(strcat("end", actor)))-improdata.Time(feature_table.idx(end))]);
-% concatenate both into a table
+        % concatenate both into a table
         feature_table=[feature_table, feature_table_diff];
         feature_table=renamevars(feature_table, "Var1", "toown");     % rename Var1 to own time
-% add values at segments
+        % add values at segments
         feature_table.value = improdata.(var)(feature_table.idx);
-% fromown
-% (vectorised via diff instead of a per-row loop; times was already
-% computed above as improdata.Time(feature_table.idx))
+
+        % fromown
         feature_table.fromown = [NaN; diff(times)];
-% Direction
-% calculated directly in segmentation
+
+        % Direction calculated directly in segmentation
         feature_table.direction=segments.(feat).(actor).direction;
-% abschgvalue (Absolute Change Value)
-% differences between next and current entry (difference to next), positive
-% = ascending curve, negative = descending curve
-% (vectorised: was a per-row loop with an if/elseif that only ever
-% reproduced "value(i+1)-value(i), or NaN if this is an ending". Also
-% fixed: the last-entry calculation below now uses
-% data.(strcat("end",actor)) instead of a hardcoded data.endC, matching
-% the feature_table_diff calculation further up -- for the Therapist
-% branch this now correctly uses the Therapist's own end-of-play index)
+
+        % abschgvalue (Absolute Change Value)
+        % differences between next and current entry (difference to next), positive = ascending curve, negative = descending curve
         notEndMask = ~isnan(feature_table.direction(1:end-1));
         stepChange = feature_table.value(2:end) - feature_table.value(1:end-1);
         abschgval = NaN(height(feature_table)-1, 1);
         abschgval(notEndMask) = stepChange(notEndMask);
         abschgval=[abschgval; improdata.(var)(data.(strcat("end", actor)))-feature_table.value(end)];
-% assign abschgvalue to table
+        
+        % assign abschgvalue to table
         feature_table.abschgvalue=abschgval;
-% chngfactor
-% (vectorised, same pattern as abschgval above; same data.(strcat("end",actor)) fix applied)
+
+        % chngfactor
         changevalues = NaN(height(feature_table)-1, 1);
         stepFactor = feature_table.value(2:end) ./ feature_table.value(1:end-1);
         changevalues(notEndMask) = stepFactor(notEndMask);
         changevalues=[changevalues; improdata.(var)(data.(strcat("end", actor)))/feature_table.value(end)];
-% assign changevalues to table
+        % assign changevalues to table
         feature_table.cchngfactor=changevalues;
-% rangepercent, totalrangepercent
-% percentage of change compared to total range
+
+        % rangepercent, totalrangepercent
+        % percentage of change compared to total range
         feature_table.rangepercent=feature_table.abschgvalue/ranges.(var);
         feature_table.totalrangepercent=feature_table.abschgvalue/rangetotal.(feat);
-% indivintensity, totalintensity, absintensity
-% calculate rangepercent vs. time - intensity value. change in percentage of
-% range per second
+
+        % indivintensity, totalintensity, absintensity
+        % calculate rangepercent vs. time - intensity value. change in percentage of range per second
         feature_table.indivintensity=feature_table.rangepercent./feature_table.toown;
         feature_table.totalintensity=feature_table.totalrangepercent./feature_table.toown;
         feature_table.absintensity=feature_table.abschgvalue./feature_table.toown;
-% zero Direction calculation as in/decrease smaller than 0.01 intensity (1 positive, -1 negative, 0 neutral)
-% segmentsc.direction(segments.intensity > -0.01 & segments.intensity < 0.01) = 0;
-% only assign zero if the original value is not NaN, so that ends aren't reinterpreted
+
+        % zero Direction calculation as in/decrease smaller than 0.01 intensity (1 positive, -1 negative, 0 neutral)
+        % segmentsc.direction(segments.intensity > -0.01 & segments.intensity < 0.01) = 0;
+        % only assign zero if the original value is not NaN, so that ends aren't reinterpreted
         feature_table.direction(abs(feature_table.indivintensity) < zerothresh & ~isnan(feature_table.direction)) = 0;
         feature_table = renamevars(feature_table, string(feature_table.Properties.VariableNames(6:end)) , strcat(lower(actor), string(feature_table.Properties.VariableNames(6:end)))); %rename actor specific features
         features.(actor) = feature_table;
-end
+    end
 
-%% Concatenation of Therapist and Client tables
-tblwidth=width(features.C);
-% prepare ctable for concatenation
-tblsegmentsc=[features.C, array2table(NaN(height(features.C), tblwidth-5))];
-tblsegmentst=[features.T, array2table(NaN(height(features.T), tblwidth-5))];
-segmentwidth=width(tblsegmentsc);
-tblsegmentsc.Properties.VariableNames(tblwidth+1:segmentwidth)=features.T.Properties.VariableNames(6:16);
-% prepare ttable for concatenation
-tblsegmentst.Properties.VariableNames(tblwidth+1:segmentwidth)=features.C.Properties.VariableNames(6:16);
-% concatenate both tables
-segmentsct=sortrows([tblsegmentsc; tblsegmentst], "time", "ascend");
+    %% Concatenation of Therapist and Client tables
+    tblwidth=width(features.C);
+    % prepare ctable for concatenation
+    tblsegmentsc=[features.C, array2table(NaN(height(features.C), tblwidth-5))];
+    tblsegmentst=[features.T, array2table(NaN(height(features.T), tblwidth-5))];
+    segmentwidth=width(tblsegmentsc);
+    tblsegmentsc.Properties.VariableNames(tblwidth+1:segmentwidth)=features.T.Properties.VariableNames(6:16);
+    % prepare ttable for concatenation
+    tblsegmentst.Properties.VariableNames(tblwidth+1:segmentwidth)=features.C.Properties.VariableNames(6:16);
+    % concatenate both tables
+    segmentsct=sortrows([tblsegmentsc; tblsegmentst], "time", "ascend");
 
-%% Calculate fromother
-% preallocation
-fromother=NaN(height(segmentsct), 1);
-% find beginning of interaction
-interactionbegin=find(segmentsct.actor~=(segmentsct.actor(1)), 1, "first");
-% NOTE: kept as a loop -- fromother(i) depends on fromother(i-1) whenever
-% the same actor keeps acting (cumulative), so this can't be vectorised
-% with simple elementwise ops without a more involved group/reset
-% derivation. Table columns are pulled into plain arrays first, since
-% repeated table.column(i) access inside a loop is noticeably slower
-% than plain array indexing of the same size.
-timeCol = segmentsct.time;
-actorColCT = segmentsct.actor;
-for i=interactionbegin:height(segmentsct)
-if actorColCT(i)==actorColCT(i-1) % if last actor was the same actor
+    %% Calculate fromother
+    % preallocation
+    fromother=NaN(height(segmentsct), 1);
+    % find beginning of interaction
+    interactionbegin=find(segmentsct.actor~=(segmentsct.actor(1)), 1, "first");
+
+    timeCol = segmentsct.time;
+    actorColCT = segmentsct.actor;
+    for i=interactionbegin:height(segmentsct)
+        if actorColCT(i)==actorColCT(i-1) % if last actor was the same actor
             fromother(i)=(timeCol(i)-timeCol(i-1))+fromother(i-1); % extend fromother value
-elseif actorColCT(i)~=actorColCT(i-1) % if last actor was another actor
+        elseif actorColCT(i)~=actorColCT(i-1) % if last actor was another actor
             fromother(i)=timeCol(i)-timeCol(i-1); % create new time
-end
-end
-segmentsct.fromother=fromother;
+        end
+    end
+    segmentsct.fromother=fromother;
 
-%% Prepare and insert Crossings
-% create array of crossings plus empty columns for variables for later
-% concatenation
-crossingsarray=segments.(feat).crossings{:, 1:2};
-empty=NaN(height(crossingsarray), 1);
-crossarray4tbl=[empty, empty, segments.(feat).crossings{:, 1}, empty, empty, empty, segments.(feat).crossings{:, 2}, NaN(height(segments.(feat).crossings{:, 1:2}), (segmentwidth-6))];
-crosstable=array2table(crossarray4tbl, "VariableNames", segmentsct.Properties.VariableNames);
-crosstable.type=cross_str;
-% concatenate and sort both into single table
-segmentstotal=sortrows([segmentsct; crosstable], "time", "ascend");
-% Relational Change Values for client and therapist(positive for affirmative, negative for contradictive)
+    %% Prepare and insert Crossings
+    % create array of crossings plus empty columns for variables for later concatenation
+    crossingsarray=segments.(feat).crossings{:, 1:2};
+    empty=NaN(height(crossingsarray), 1);
+    crossarray4tbl=[empty, empty, segments.(feat).crossings{:, 1}, empty, empty, empty, segments.(feat).crossings{:, 2}, NaN(height(segments.(feat).crossings{:, 1:2}), (segmentwidth-6))];
+    crosstable=array2table(crossarray4tbl, "VariableNames", segmentsct.Properties.VariableNames);
+    crosstable.type=cross_str;
+    % concatenate and sort both into single table
+    segmentstotal=sortrows([segmentsct; crosstable], "time", "ascend");
+    % Relational Change Values for client and therapist(positive for affirmative, negative for contradictive)
 
-%% Combined Actor Calculations
-% Fill movement information (doubles)
-% fill crossing information for therapist
-segmentstotal.tvalue(segmentstotal.type=="crossing")=segmentstotal.cvalue(segmentstotal.type=="crossing");
-% client side
+    %% Combined Actor Calculations
+    % Fill movement information (doubles)
+
+    % fill crossing information for therapist
+    segmentstotal.tvalue(segmentstotal.type=="crossing")=segmentstotal.cvalue(segmentstotal.type=="crossing");
+    % client side
     segmentstotal.cvalue(segmentstotal.actor=="T")=improdata.(strcat(feat,"C"))(segmentstotal.idx(segmentstotal.actor=="T"));
-% NOTE: kept as a loop (same reasoning as fromother -- a fill can chain
-% off a value filled earlier in this same pass), columns pulled into
-% plain arrays first to avoid per-element table overhead.
-clientCols = segmentstotal{:, 9:16};
-cvalueCol = segmentstotal.cvalue;
-actorCol = segmentstotal.actor;
-cdirCol = segmentstotal.cdirection;
-for x=1:width(clientCols) % double values for client movement information
-for i=2:height(segmentstotal)
-if isnan(clientCols(i,x)) && ~isnan(cvalueCol(i)) && ~(actorCol(i)=="C" && isnan(cdirCol(i))) % if current entry is empty, but theres a value and current entry is no end of play
-               clientCols(i,x)=clientCols(i-1,x);
-end
-end
-end
-segmentstotal{:, 9:16} = clientCols;
-% therapist side
+
+    clientCols = segmentstotal{:, 9:16};
+    cvalueCol = segmentstotal.cvalue;
+    actorCol = segmentstotal.actor;
+    cdirCol = segmentstotal.cdirection;
+    for x=1:width(clientCols) % double values for client movement information
+        for i=2:height(segmentstotal)
+            if isnan(clientCols(i,x)) && ~isnan(cvalueCol(i)) && ~(actorCol(i)=="C" && isnan(cdirCol(i))) % if current entry is empty, but theres a value and current entry is no end of play
+                clientCols(i,x)=clientCols(i-1,x);
+            end
+        end
+    end
+
+    segmentstotal{:, 9:16} = clientCols;
+
+    % therapist side
     segmentstotal.tvalue(segmentstotal.actor=="C")=improdata.(strcat(feat,"T"))(segmentstotal.idx(segmentstotal.actor=="C"));
-therapistCols = segmentstotal{:, 20:27};
-tvalueCol = segmentstotal.tvalue;
-tdirCol = segmentstotal.tdirection;
-for x=1:width(therapistCols) % double values for therapist movement information
-for i=2:height(segmentstotal)
-if isnan(therapistCols(i,x)) && ~isnan(tvalueCol(i)) && ~(actorCol(i)=="T" && isnan(tdirCol(i))) % if current entry is empty, but theres a value and current entry is no end of play
-               therapistCols(i,x)=therapistCols(i-1,x);
-end
-end
-end
-segmentstotal{:, 20:27} = therapistCols;
-% erase ending sequence movement information
-% (vectorised: was a per-row loop, no row-to-row dependency here)
-endC_rows = segmentstotal.segtype=="end" & segmentstotal.actor=="C";
-endT_rows = segmentstotal.segtype=="end" & segmentstotal.actor=="T";
-segmentstotal{endC_rows, 9:16} = NaN;
-segmentstotal{endT_rows, 20:27} = NaN;
-% relchgtendencies
-% (vectorised via masks: every row's classification only depends on that
-% row's own cdirection/tdirection/type/cvalue/tvalue, no row-to-row
-% dependency, so this is safe to fully vectorise. Masks are built to
-% mirror the original if/elseif precedence exactly: solo -> crossing ->
-% neutral -> value comparison, each mask excludes all earlier ones.)
-n = height(segmentstotal);
-cdir = segmentstotal.cdirection;
-tdir = segmentstotal.tdirection;
-cval = segmentstotal.cvalue;
-tval = segmentstotal.tvalue;
-isCrossing = segmentstotal.type == "crossing";
-% Client
-crelchgtendency = strings(n, 1); % rows that match nothing stay "" (converted to missing below, same as original)
-soloMask = ~isnan(cdir) & isnan(tdir);
-crossMask = ~isnan(cdir) & ~isnan(tdir) & isCrossing;
-neutralMask = ~isnan(cdir) & ~isnan(tdir) & ~isCrossing & cdir==0;
-belowMask = ~isnan(cdir) & ~isnan(tdir) & ~isCrossing & cdir~=0 & cval<tval;
-aboveMask = ~isnan(cdir) & ~isnan(tdir) & ~isCrossing & cdir~=0 & cval>tval;
-crelchgtendency(soloMask) = "solo"; % if client is playing without therapist - solo
-crelchgtendency(crossMask) = "crossing"; % if both are crossing
-crelchgtendency(neutralMask) = "neutral"; % if movement is 0
-crelchgtendency(belowMask & cdir==1) = "affirmative"; % client below therapist and increasing
-crelchgtendency(belowMask & cdir==-1) = "contradictive"; % client below therapist and decreasing
-crelchgtendency(aboveMask & cdir==1) = "contradictive"; % client above therapist and increasing
-crelchgtendency(aboveMask & cdir==-1) = "affirmative"; % client above therapist and decreasing
+    therapistCols = segmentstotal{:, 20:27};
+    tvalueCol = segmentstotal.tvalue;
+    tdirCol = segmentstotal.tdirection;
+    for x=1:width(therapistCols) % double values for therapist movement information
+        for i=2:height(segmentstotal)
+            if isnan(therapistCols(i,x)) && ~isnan(tvalueCol(i)) && ~(actorCol(i)=="T" && isnan(tdirCol(i))) % if current entry is empty, but theres a value and current entry is no end of play
+                therapistCols(i,x)=therapistCols(i-1,x);
+            end
+        end
+    end
+    segmentstotal{:, 20:27} = therapistCols;
+
+    % erase ending sequence movement information
+    endC_rows = segmentstotal.segtype=="end" & segmentstotal.actor=="C";
+    endT_rows = segmentstotal.segtype=="end" & segmentstotal.actor=="T";
+    segmentstotal{endC_rows, 9:16} = NaN;
+    segmentstotal{endT_rows, 20:27} = NaN;
+
+    % relchgtendencies
+    n = height(segmentstotal);
+    cdir = segmentstotal.cdirection;
+    tdir = segmentstotal.tdirection;
+    cval = segmentstotal.cvalue;
+    tval = segmentstotal.tvalue;
+    isCrossing = segmentstotal.type == "crossing";
+
+    % Client
+    crelchgtendency = strings(n, 1); % rows that match nothing stay "" (converted to missing below, same as original)
+    soloMask = ~isnan(cdir) & isnan(tdir);
+    crossMask = ~isnan(cdir) & ~isnan(tdir) & isCrossing;
+    neutralMask = ~isnan(cdir) & ~isnan(tdir) & ~isCrossing & cdir==0;
+    belowMask = ~isnan(cdir) & ~isnan(tdir) & ~isCrossing & cdir~=0 & cval<tval;
+    aboveMask = ~isnan(cdir) & ~isnan(tdir) & ~isCrossing & cdir~=0 & cval>tval;
+    crelchgtendency(soloMask) = "solo"; % if client is playing without therapist - solo
+    crelchgtendency(crossMask) = "crossing"; % if both are crossing
+    crelchgtendency(neutralMask) = "neutral"; % if movement is 0
+    crelchgtendency(belowMask & cdir==1) = "affirmative"; % client below therapist and increasing
+    crelchgtendency(belowMask & cdir==-1) = "contradictive"; % client below therapist and decreasing
+    crelchgtendency(aboveMask & cdir==1) = "contradictive"; % client above therapist and increasing
+    crelchgtendency(aboveMask & cdir==-1) = "affirmative"; % client above therapist and decreasing
     segmentstotal.crelchgtendency=crelchgtendency; % assign vector to table
     segmentstotal.crelchgtendency(segmentstotal.crelchgtendency=="")=missing; % insert missing values
-% Therapist (mirrored)
-trelchgtendency = strings(n, 1);
-soloMaskT = ~isnan(tdir) & isnan(cdir);
-crossMaskT = ~isnan(tdir) & ~isnan(cdir) & isCrossing;
-neutralMaskT = ~isnan(tdir) & ~isnan(cdir) & ~isCrossing & tdir==0;
-belowMaskT = ~isnan(tdir) & ~isnan(cdir) & ~isCrossing & tdir~=0 & tval<cval;
-aboveMaskT = ~isnan(tdir) & ~isnan(cdir) & ~isCrossing & tdir~=0 & tval>cval;
-trelchgtendency(soloMaskT) = "solo"; % if therapist is playing without client - solo
-trelchgtendency(crossMaskT) = "crossing"; % if both are crossing
-trelchgtendency(neutralMaskT) = "neutral"; % if movement is 0
-trelchgtendency(belowMaskT & tdir==1) = "affirmative"; % therapist below client and increasing
-trelchgtendency(belowMaskT & tdir==-1) = "contradictive"; % therapist below client and decreasing
-trelchgtendency(aboveMaskT & tdir==1) = "contradictive"; % therapist above client and increasing
-trelchgtendency(aboveMaskT & tdir==-1) = "affirmative"; % therapist above client and decreasing
+
+    % Therapist (mirrored)
+    trelchgtendency = strings(n, 1);
+    soloMaskT = ~isnan(tdir) & isnan(cdir);
+    crossMaskT = ~isnan(tdir) & ~isnan(cdir) & isCrossing;
+    neutralMaskT = ~isnan(tdir) & ~isnan(cdir) & ~isCrossing & tdir==0;
+    belowMaskT = ~isnan(tdir) & ~isnan(cdir) & ~isCrossing & tdir~=0 & tval<cval;
+    aboveMaskT = ~isnan(tdir) & ~isnan(cdir) & ~isCrossing & tdir~=0 & tval>cval;
+    trelchgtendency(soloMaskT) = "solo"; % if therapist is playing without client - solo
+    trelchgtendency(crossMaskT) = "crossing"; % if both are crossing
+    trelchgtendency(neutralMaskT) = "neutral"; % if movement is 0
+    trelchgtendency(belowMaskT & tdir==1) = "affirmative"; % therapist below client and increasing
+    trelchgtendency(belowMaskT & tdir==-1) = "contradictive"; % therapist below client and decreasing
+    trelchgtendency(aboveMaskT & tdir==1) = "contradictive"; % therapist above client and increasing
+    trelchgtendency(aboveMaskT & tdir==-1) = "affirmative"; % therapist above client and decreasing
     segmentstotal.trelchgtendency=trelchgtendency; % assign vector to table
     segmentstotal.trelchgtendency(segmentstotal.trelchgtendency=="")=missing; % insert missing values
-% Change crossing string values
-% NOTE: kept as a loop -- a crossing row's flip can in principle chain
-% off the row directly above it if that row was also a (just-flipped)
-% crossing row. Columns pulled into plain arrays first to avoid
-% per-element table overhead.
-relCols = segmentstotal{:, 29:30};
-typeCol = segmentstotal.type;
-for f=1:2 % loop for changing of crossings strings (columns 29:30 = crelchgtendency, trelchgtendency)
-for i=2:height(segmentstotal) % start from 2 for backwards comparison
-if typeCol(i)=="crossing" % if current entry is crossing, change the last entries relchgtendencies for current
-if relCols(i-1,f)=="affirmative"
-                   relCols(i,f)="contradictive";
-elseif relCols(i-1,f)=="contradictive"
-                   relCols(i,f)="affirmative";
-elseif relCols(i-1,f)=="neutral"
+
+    % Change crossing string values
+    relCols = segmentstotal{:, 29:30};
+    typeCol = segmentstotal.type;
+    for f=1:2 % loop for changing of crossings strings (columns 29:30 = crelchgtendency, trelchgtendency)
+        for i=2:height(segmentstotal) % start from 2 for backwards comparison
+            if typeCol(i)=="crossing" % if current entry is crossing, change the last entries relchgtendencies for current
+                if relCols(i-1,f)=="affirmative"
+                    relCols(i,f)="contradictive";
+                elseif relCols(i-1,f)=="contradictive"
+                    relCols(i,f)="affirmative";
+                elseif relCols(i-1,f)=="neutral"
                     relCols(i,f)="neutral";
-end
-end
-end
-end
-segmentstotal{:, 29:30} = relCols;
-% Relchgvalues / relational intensity / relational absolute intensity
-% (vectorised: all six blocks below followed the exact same
-% affirmative/contradictive/neutral/solo -> value pattern, just applied
-% to a different magnitude column, so they're now one helper call each
-% instead of six near-identical per-row loops. See relFromTendency at
-% the bottom of this file.)
-segmentstotal.crelchgvalue = relFromTendency(segmentstotal.crelchgtendency, segmentstotal.cabschgvalue);
-segmentstotal.trelchgvalue = relFromTendency(segmentstotal.trelchgtendency, segmentstotal.tabschgvalue);
-segmentstotal.crelintensity = relFromTendency(segmentstotal.crelchgtendency, segmentstotal.ctotalintensity);
-segmentstotal.trelintensity = relFromTendency(segmentstotal.trelchgtendency, segmentstotal.ttotalintensity);
-segmentstotal.cabsrelintensity = relFromTendency(segmentstotal.crelchgtendency, segmentstotal.cabsintensity);
-segmentstotal.tabsrelintensity = relFromTendency(segmentstotal.trelchgtendency, segmentstotal.tabsintensity);
-% Add Time to next action (tonext)
-% calculate time to next action
+                end
+            end
+        end
+    end
+    segmentstotal{:, 29:30} = relCols;
+
+    % Relchgvalues / relational intensity / relational absolute intensity
+    segmentstotal.crelchgvalue = relFromTendency(segmentstotal.crelchgtendency, segmentstotal.cabschgvalue);
+    segmentstotal.trelchgvalue = relFromTendency(segmentstotal.trelchgtendency, segmentstotal.tabschgvalue);
+    segmentstotal.crelintensity = relFromTendency(segmentstotal.crelchgtendency, segmentstotal.ctotalintensity);
+    segmentstotal.trelintensity = relFromTendency(segmentstotal.trelchgtendency, segmentstotal.ttotalintensity);
+    segmentstotal.cabsrelintensity = relFromTendency(segmentstotal.crelchgtendency, segmentstotal.cabsintensity);
+    segmentstotal.tabsrelintensity = relFromTendency(segmentstotal.trelchgtendency, segmentstotal.tabsintensity);
+
+    % Add Time to next action (tonext)
     timediff=diff(segmentstotal.time);
-% time of last action
+    % time of last action
     lasttime=improdata.Time(data.endtotal)-segmentstotal.time(end);
-% add timeuntilnext to table
+    % add time until next to table
     segmentstotal.tonext=[timediff; lasttime];
-% add Time from last Action (fromlast)
+
+    % add Time from last Action (fromlast)
     firsttime=segmentstotal.time(1)-improdata.Time(data.begintotal);
     segmentstotal.fromlast=[firsttime; timediff];
-% featdelta, featdeltadifferences and percentages plus meandelta
-% Differences (Delta) of Feature between players at indexes
-% calculation of featdelta as current difference between client and therapist value
-% extract values of client and therapist
+
+    % featdelta, featdeltadifferences and percentages plus meandelta Differences (Delta) of Feature between players at indexes calculation of featdelta as current difference between client and therapist value extract values of client and therapist
     segmentstotal.featdelta = segmentstotal.cvalue-segmentstotal.tvalue;
-% calculate percentage of delta in relation to common total range of feature
+
+    % calculate percentage of delta in relation to common total range of feature
     segmentstotal.featdeltapercent=segmentstotal.featdelta/rangetotal.(feat);
-% Delta Tendencies between each index (absolute)
-% last inter(action) isn't followed by another action - therefore no
-% difference to the next
-% (vectorised via diff; the last row is left unset by design, same as
-% the original, and picks up NaN as a new table column's default fill)
+
+    % Delta Tendencies between each index (absolute) last inter(action) isn't followed by another action - therefore no difference to the next
     segmentstotal.featdeltadifference = [diff(segmentstotal.featdelta); NaN];
-% Delta Tendencies Percentage
-% calculate percentage of delta tendencies in relation to common total range of feature
+
+    % Delta Tendencies Percentage
+    % calculate percentage of delta tendencies in relation to common total range of feature
     segmentstotal.featdeltapercentdiff=segmentstotal.featdeltadifference/rangetotal.(feat);
-% calculate mean delta value for current segment
-% NOTE: kept as a loop -- each iteration needs a range-lookup against the
-% full data.smoothed.Time vector, which isn't a simple per-row
-% recurrence, so vectorising it safely would need a more involved
-% binning derivation I can't verify without running MATLAB. The two
-% per-iteration lookups that were constant across the whole loop
-% (rebuilding "feat"+"Diff" and re-reading data.smoothed.Time on every
-% pass) are hoisted out instead, which is a safe, free win regardless.
-featdeltamean = []; % explicit fresh start each feature iteration (was implicitly relying on clearvars for this before)
-diffCol = diffdata.(strcat(feat, "Diff"));
-smoothedTime = data.smoothed.Time;
-for h=1:(height(segmentstotal)-1) % loop from beginning until last segment
+
+    % calculate mean delta value for current segment
+    featdeltamean = []; % explicit fresh start each feature iteration (was implicitly relying on clearvars for this before)
+    diffCol = diffdata.(strcat(feat, "Diff"));
+    smoothedTime = data.smoothed.Time;
+    for h=1:(height(segmentstotal)-1) % loop from beginning until last segment
         begintime=segmentstotal.time(h);
         endtime=segmentstotal.time(h+1);
         between=(begintime < smoothedTime) & (smoothedTime < endtime); % extract time idxs between current and next interaction
         betweendata=diffCol(between); % extract data between actions
         deltadata=[segmentstotal.featdelta(h); betweendata; segmentstotal.featdelta(h+1)]; % concatenate and calculate mean of data in between plus the single entries - slightly unprecise measure for crossings as they are calculated as if .1s duration
         featdeltamean(h)=mean(deltadata);
-end
+    end
     featdeltamean=featdeltamean';
-% add last value
-        begintime=segmentstotal.time(end); % last time value is beginning
-        endtime=smoothedTime(find(~isnan(smoothedTime), 1, "last")); % end is the end of the impro data (last non NaN entry)
-        between=(begintime < smoothedTime) & (smoothedTime <= endtime); % extract time idxs util end
-        betweendata=diffCol(between); % extract data until end
-        deltadata=[segmentstotal.featdelta(end); betweendata]; % concatenate beginning and remaining data
-        featdeltamean(end+1)=mean(deltadata); % calculate mean of concatenated data
+
+    % add last value
+    begintime=segmentstotal.time(end); % last time value is beginning
+    endtime=smoothedTime(find(~isnan(smoothedTime), 1, "last")); % end is the end of the impro data (last non NaN entry)
+    between=(begintime < smoothedTime) & (smoothedTime <= endtime); % extract time idxs util end
+    betweendata=diffCol(between); % extract data until end
+    deltadata=[segmentstotal.featdelta(end); betweendata]; % concatenate beginning and remaining data
+    featdeltamean(end+1)=mean(deltadata); % calculate mean of concatenated data
     segmentstotal.featdeltamean=featdeltamean;
-% featdeltameanpercent
+    % featdeltameanpercent
     segmentstotal.featdeltameanpercent=segmentstotal.featdeltamean/data.rangetotal.(feat);
-%% show resulting table, sort and assign to new struct for features
-feats.(feat)=segmentstotal(:, ["idx", "time", "segtype", "type", "actor", "fromother", "tonext", "cvalue", "cdirection", "cabsintensity", "ctotalintensity", "crelintensity", "crelchgtendency", "tvalue", "tdirection", "tabsintensity", "ttotalintensity", "trelintensity", "trelchgtendency","featdeltapercent", "featdeltapercentdiff", "featdeltameanpercent"]);
+
+    %% show resulting table, sort and assign to new struct for features
+    feats.(feat)=segmentstotal(:, ["idx", "time", "segtype", "type", "actor", "fromother", "tonext", "cvalue", "cdirection", "cabsintensity", "ctotalintensity", "crelintensity", "crelchgtendency", "tvalue", "tdirection", "tabsintensity", "ttotalintensity", "trelintensity", "trelchgtendency","featdeltapercent", "featdeltapercentdiff", "featdeltameanpercent"]);
 end
 end
 
 %% ------------------------------------------------------------------
 function relvalue = relFromTendency(tendency, magnitude)
-% Maps a relchgtendency category ("affirmative"/"contradictive"/
-% "neutral"/"solo") to a signed value derived from magnitude:
-% +abs(magnitude) for affirmative, -abs(magnitude) for contradictive, 0
-% for neutral/solo, and NaN for anything else (e.g. "crossing", or
-% missing) -- consolidates six near-identical per-row loops that only
-% ever differed in which magnitude column they read.
+
 relvalue = NaN(height(tendency), 1);
 relvalue(tendency == "affirmative") = abs(magnitude(tendency == "affirmative"));
 relvalue(tendency == "contradictive") = -abs(magnitude(tendency == "contradictive"));

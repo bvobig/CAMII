@@ -10,21 +10,21 @@ tvaridx=[1:7,14:19,8:13,20:22]; % therapist table: swap 8:13 and 14:19 so the th
 
 for i=1:numel(feature_names)
     feat = feature_names(i);
-% rearrange table
-% (vectorised: table column selection/reordering already applies to all
-% rows at once -- feats.(feat)(:, idx) is exactly equivalent to the
-% previous per-row loop that copied row i, columns idx, for every row,
-% just without the per-row table-assignment overhead)
+    % rearrange table
     obsc.(feat) = feats.(feat)(:, cvaridx);
     obst.(feat) = feats.(feat)(:, tvaridx);
-% rename variables
+
+    % rename variables
     obsc.(feat) = renamevars(obsc.(feat), 8:19, obsnames);
     obst.(feat) = renamevars(obst.(feat), 8:19, obsnames);
-% add "feature" column
+
+    % add "feature" column
     obsc.(feat).feature(:)=feat;
     obst.(feat).feature(:)=feat;
-% add empty "interactiontype" column
+
+    % add empty "interactiontype" column
     obsc.(feat).interactiontype(:)=categorical(NaN);
     obst.(feat).interactiontype(:)=categorical(NaN);
+
 end
 end

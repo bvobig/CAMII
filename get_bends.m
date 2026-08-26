@@ -7,22 +7,21 @@ arguments
     scale_method (1,1) string {mustBeMember(scale_method, ["zscore","mad","none"])} = "zscore"
 end
 
-%% normalize scale so the angle is comparable regardless of this
-% feature's original units/magnitude
+%% normalize scale so the angle is comparable regardless of the feature's original units/magnitude
 switch scale_method
-case "zscore"
+    case "zscore"
         s = std(data, 'omitnan');
-if s == 0 || isnan(s)
+        if s == 0 || isnan(s)
             s = 1; % constant/degenerate series -> no scaling needed
-end
+        end
         data_scaled = (data - mean(data, 'omitnan')) / s;
-case "mad"
+    case "mad"
         m = mad(data, 1); % median absolute deviation
-if m == 0 || isnan(m)
+        if m == 0 || isnan(m)
             m = 1;
-end
+        end
         data_scaled = (data - median(data, 'omitnan')) / m;
-case "none"
+    case "none"
         data_scaled = data;
 end
 
@@ -35,23 +34,21 @@ theta = atand(slopes);
 
 %% gather all local extrema to omit when detecting bends
 extrema_idx = sort([find(islocalmax(data, "FlatSelection", "all")); ...
-                     find(islocalmin(data, "FlatSelection", "all"))]);
+    find(islocalmin(data, "FlatSelection", "all"))]);
 is_extremum = false(n, 1);
 is_extremum(extrema_idx) = true;
-% angle difference between consecutive segments 
 
+%% angle difference between consecutive segments
 delta_theta = NaN(n, 1);
 stepMask = ~is_extremum(1:n-1);
 stepDelta = theta(2:n) - theta(1:n-1);
 delta_theta([stepMask; false]) = stepDelta(stepMask);
 
-%% extract relevant slopes (threshold_angle_deg default is 15)
+%% extract relevant slopes
 bend = abs(delta_theta) > threshold_angle_deg;
 bend_idx = find(bend);
 
 %% detect direction based on slope after idx value
-% (vectorised: was a per-bend loop; guards the same idx+1<=n boundary
-% check via a logical mask instead of an if inside the loop)
 direction = NaN(numel(bend_idx), 1);
 validNext = (bend_idx + 1) <= n;
 direction(validNext) = sign(slopes(bend_idx(validNext) + 1));

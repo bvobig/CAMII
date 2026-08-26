@@ -15,7 +15,7 @@ varnames=["Time", "Time_End", "Time_Start", "ACC", "ACT", "ArticulationC", "Arti
 impro=renamevars(impro, 1:width(impro), varnames(2:end));
 
 %% Time Indexing
-% calculate new "Time" indicator as median between Frame Begin and Frame End
+% calculate new "Time" indicator as mean between Frame Begin and Frame End
 impro.Time=(impro.Time_End+impro.Time_Start)/2;
 impro=movevars(impro, "Time", "Before", "Time_End");
 % Exclude Time_End from Calculation
@@ -53,13 +53,13 @@ improshort=impro(beginidx:endidx, :);
 %% Data Smoothing
 % create new table for smoothed Data with moving mean of 20ms, each for normal and short
 switch smoothmethod
-case 1 % uniform smoothing by 20frame movmean
+    case 1 % uniform smoothing by 20frame movmean
         smoothimpro=smoothdata(impro(:, 3:end),"movmean",20);
         smoothimproshort=smoothdata(improshort(:, 3:end), "movmean",20);
-case 2 % individual smoothing by Smoothingfactor = 0.1
+    case 2 % individual smoothing by Smoothingfactor = 0.1
         smoothimpro=smoothdata(impro(:, 3:end),"movmean",SmoothingFactor=0.1);
         smoothimproshort=smoothdata(improshort(:, 3:end), "movmean",SmoothingFactor=0.1);
-otherwise
+    otherwise
         error('camii:preproc:InvalidSmoothMethod', ...
             'Invalid smoothmethod (%s). Valid options are 1 (fixed 20-frame movmean) or 2 (movmean with SmoothingFactor=0.1).', mat2str(smoothmethod))
 end
@@ -77,36 +77,36 @@ smoothimproshort=restoreNaNs(improshort, smoothimproshort, varnameschar);
 % Calculate Individual Statistical Data for each Feature
 % Range
 % calculate and rename range
-    improranges=range(impro(:, 3:end));
-    improranges=renamevars(improranges, 1:width(improranges), (varnames(3:end)));
+improranges=range(impro(:, 3:end));
+improranges=renamevars(improranges, 1:width(improranges), (varnames(3:end)));
 % smoothed
-    improrangessmooth=range(smoothimpro(:, 3:end));
-    improrangessmooth=renamevars(improrangessmooth, 1:width(improrangessmooth), (varnames(3:end)));
+improrangessmooth=range(smoothimpro(:, 3:end));
+improrangessmooth=renamevars(improrangessmooth, 1:width(improrangessmooth), (varnames(3:end)));
 % Mean
 % calculate and rename mean
-    impromeans=mean(impro(:, 3:end), "omitmissing");
-    impromeans=renamevars(impromeans, 1:width(impromeans), (varnames(3:end)));
+impromeans=mean(impro(:, 3:end), "omitmissing");
+impromeans=renamevars(impromeans, 1:width(impromeans), (varnames(3:end)));
 % smoothed
-    impromeanssmoothed=mean(smoothimpro(:, 3:end), "omitmissing");
-    impromeanssmoothed=renamevars(impromeanssmoothed, 1:width(impromeanssmoothed), (varnames(3:end)));
+impromeanssmoothed=mean(smoothimpro(:, 3:end), "omitmissing");
+impromeanssmoothed=renamevars(impromeanssmoothed, 1:width(impromeanssmoothed), (varnames(3:end)));
 % Median
 % calculate and rename median
-    impromedian=median(impro(:, 3:end), "omitmissing");
-    impromedian=renamevars(impromedian, 1:width(impromedian), (varnames(3:end)));
+impromedian=median(impro(:, 3:end), "omitmissing");
+impromedian=renamevars(impromedian, 1:width(impromedian), (varnames(3:end)));
 % smoothed
-    impromediansmoothed=median(smoothimpro(:, 3:end), "omitmissing");
-    impromediansmoothed=renamevars(impromediansmoothed, 1:width(impromediansmoothed), (varnames(3:end)));
+impromediansmoothed=median(smoothimpro(:, 3:end), "omitmissing");
+impromediansmoothed=renamevars(impromediansmoothed, 1:width(impromediansmoothed), (varnames(3:end)));
 % Standard Deviation
 % calculate and rename std, w in this case is 1 because all values are
 % present, set to 0 for estimation of mean by n-1 to compensate for using
 % estimated values as in a sample set
-    improstd=std(impro(:, 3:end), 1, "omitmissing");
-    improstd=renamevars(improstd, 1:width(improstd), (varnames(3:end)));
+improstd=std(impro(:, 3:end), 1, "omitmissing");
+improstd=renamevars(improstd, 1:width(improstd), (varnames(3:end)));
 % smoothed
-    improstdsmoothed=std(smoothimpro(:, 3:end), 1, "omitmissing");
-    improstdsmoothed=renamevars(improstdsmoothed, 1:width(improstdsmoothed), (varnames(3:end)));
+improstdsmoothed=std(smoothimpro(:, 3:end), 1, "omitmissing");
+improstdsmoothed=renamevars(improstdsmoothed, 1:width(improstdsmoothed), (varnames(3:end)));
 
-    %% Difference Calculation
+%% Difference Calculation
 % Calculate FeatDelta between Players (forward)
 % calculate difference between the two players for original data
 % client minus therapist (positive values mean client is above therapist, negative values mean client is below therapist)
