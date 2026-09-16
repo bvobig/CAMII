@@ -5,6 +5,7 @@ function [results] = camii_analysis(midi_file, options)
         options.buffer_size (1,1) double = 25
         options.zero_threshold (1,1) double = 0.01
         options.partner_threshold (1,1) double = 0.2
+        options.resolution (1,1) double = 0.1
     end
 
 %%
@@ -54,7 +55,7 @@ function [results] = camii_analysis(midi_file, options)
 load ("camii_model.mat", "camii_model") % load ML model
 
 %%
-improdata = mttb_light2(midi_file, 0.1, 6);
+improdata = mttb_light2(midi_file, options.resolution, 6);
 [data, segments, feats, stats, types, typestotal] = analysis (improdata, camii_model, options); %Analyse Data
 
 % Gather Results
