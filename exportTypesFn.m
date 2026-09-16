@@ -50,20 +50,29 @@ for feat = s
     close(combinedFig)
 
     %% Visualise Difference between Client and Therapist
-    typesdiff = typestotal.c.(var){1,:} - typestotal.t.(var){1,:}; % positive values - client direction, negative values, therapist direction
-    diffFig = figure(Visible="off");
-    axDiff = axes(diffFig);
-    bar(axDiff, 1:7, typesdiff, FaceColor="flat", CData=colorpalette, FaceAlpha=0.1);
-    xticklabels(axDiff, iatypenames)
-    ylabel(axDiff, "Difference in Decimal Percentage")
-    axis(axDiff, [0, 7, -1, 1])
-    yyaxis(axDiff, "right")
-    yticks(axDiff, [])
-    set(axDiff, YColor="k")
-    ylabel(axDiff, "Therapist                         Client", Color="k")
-    yyaxis(axDiff, "left")
-    title(axDiff, "Gradient Prevalence Comparison")
-    axDiff.FontName = "Times New Roman";
+    typesdiff = data.typestotal.c.MeanVelocity - data.typestotal.t.MeanVelocity; % positive = client direction, negative = therapist direction
+    
+    statbar = bar(ax, 1:6, typesdiff, FaceColor="flat", CData=colorpalette, FaceAlpha=0.1);
+    ax.FontName = "Times New Roman";
+    ylabel(ax, "Difference in Decimal Percentage", FontAngle="normal")
+    
+    % symmetric limits so negative (therapist) bars stay visible
+    ylimit = max(abs(typesdiff)) + 0.1;
+    ylim(ax, [-ylimit, ylimit])
+    xticklabels(ax, iatypenames)
+    
+    % data labels on top/bottom of each bar
+    xtips1 = statbar.XEndPoints;
+    ytips1 = statbar.YEndPoints;
+    labels1 = string(round(statbar.YData, 2));
+    text(ax, xtips1, ytips1, labels1, HorizontalAlignment="center", VerticalAlignment="bottom")
+    
+    % "Therapist ... Client" direction label on a second, tick-free axis
+    yyaxis(ax, "right")
+    yticks(ax, [])
+    set(ax, YColor="k")
+    ylabel(ax, "Therapist            Client", Color="k")
+    yyaxis(ax, "left")
 
     exportgraphics(diffFig, fullfile(outdir, clno + "_iatypes_" + var + "_comparison." + expformat), Resolution=600)
     close(diffFig)
