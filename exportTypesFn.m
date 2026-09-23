@@ -75,7 +75,7 @@ for feat = s
         axBar.XAxis.FontSize = 10;
         xtips1 = statbar.XEndPoints;
         ytips1 = statbar.YEndPoints;
-        labels1 = string(statbar.YData);
+        labels1 = compose("%.2f", statbar.YData);
         text(axBar, xtips1, ytips1, labels1, HorizontalAlignment="center", VerticalAlignment="bottom")
         switch actor
             case "c"
@@ -108,7 +108,7 @@ for feat = s
     % data labels above/below each bar, depending on sign
     xtips1 = statbar.XEndPoints;
     ytips1 = statbar.YEndPoints;
-    labels1 = string(round(statbar.YData, 2));
+    labels1 = compose("%.2f", statbar.YData);
 
     for i = 1:numel(typesdiff)
         if typesdiff(i) >= 0
@@ -136,7 +136,7 @@ for feat = s
     for actoridx = 1:2
         actor = ct(actoridx);
 
-        % --- Evolution plot (single) ---
+        % Evolution plot (single)
         evoFig = figure(Visible="off", Position=[10 10 lengthplot (heightplot/2)]);
         axEvoSingle = axes(evoFig);
 
@@ -180,7 +180,7 @@ for feat = s
         xticklabels(axDistSingle, iatypenames)
         xtips1 = statbar.XEndPoints;
         ytips1 = statbar.YEndPoints;
-        labels1 = string(statbar.YData);
+         labels1 = compose("%.2f", statbar.YData);
         text(axDistSingle, xtips1, ytips1, labels1, HorizontalAlignment="center", VerticalAlignment="bottom")
         switch actor
             case "c"
