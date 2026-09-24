@@ -63,25 +63,29 @@ for feat = s
         end
         legend(axEvo, Location="eastoutside", FontAngle="normal")
 
-        % Distribution bar (combined)
-        axBar = nexttile(tlo, [1 1]);
-        statbar = bar(axBar, 1:7, typestotal.(actor).(var){1, :}, FaceColor="flat", CData=colorpalette, FaceAlpha=0.1);
-        axBar.FontName = "Times New Roman";
-        ylabel(axBar, "Decimal Percentage", FontAngle="normal")
-        ylim(axBar, [0 (max(typestotal.(actor).(var){1, :})+0.1)])
-        xticks(axBar, 1:7)
-        xlim(axBar, [0, 8])
-        xticklabels(axBar, iatypenames)
-        axBar.XAxis.FontSize = 10;
-        xtips1 = statbar.XEndPoints;
-        ytips1 = statbar.YEndPoints;
-        labels1 = compose("%.2f", statbar.YData);
-        text(axBar, xtips1, ytips1, labels1, HorizontalAlignment="center", VerticalAlignment="bottom")
+        % Distribution pie chart (combined)
+        axPie = nexttile(tlo, [1 1]);
+
+        distribution = typestotal.(actor).(var){1, :};
+        keep = distribution > 0;
+        distribution_filtered = distribution(keep);
+        names_filtered = iatypenames(keep);
+        colors_filtered = colorpalette(keep, :);
+
+        labelsPie = strcat(names_filtered, " ", string(round(distribution_filtered*100, 1)), "%");
+
+        p = pie(axPie, distribution_filtered, labelsPie);
+        patches = p(1:2:end);
+        for k = 1:numel(patches)
+            patches(k).FaceColor = colors_filtered(k, :);
+            patches(k).FaceAlpha = 0.3;
+        end
+        axPie.FontName = "Times New Roman";
         switch actor
             case "c"
-                title(axBar, "Client", FontAngle="normal")
+                title(axPie, "Client", FontAngle="normal")
             case "t"
-                title(axBar, "Therapist", FontAngle="normal")
+                title(axPie, "Therapist", FontAngle="normal")
         end
     end
 
@@ -94,24 +98,31 @@ for feat = s
     diffFig = figure(Visible="off", Position=[10 10 lengthplot/3, heightplot/2]);
     ax = axes(diffFig);
 
-    statbar = bar(ax, 1:7, typesdiff, FaceColor="flat", CData=colorpalette, FaceAlpha=0.1);
+    % filter out zero (or near-zero) categories
+    keepDiff = typesdiff ~= 0;
+    typesdiff_filtered = typesdiff(keepDiff);
+    namesDiff_filtered = iatypenames(keepDiff);
+    colorsDiff_filtered = colorpalette(keepDiff, :);
+    nBars = numel(typesdiff_filtered);
+
+    statbar = bar(ax, 1:nBars, typesdiff_filtered, FaceColor="flat", CData=colorsDiff_filtered, FaceAlpha=0.1);
     ax.FontName = "Times New Roman";
     ylabel(ax, "Difference in Decimal Percentage", FontAngle="normal")
 
     % symmetric limits so negative (therapist) bars stay visible
-    ylimit = max(abs(typesdiff)) + 0.1;
+    ylimit = max(abs(typesdiff_filtered)) + 0.1;
     ylim(ax, [-ylimit, ylimit])
-    xticks(ax, 1:7)
-    xticklabels(ax, iatypenames)
-    xlim(ax, [0, 8])
+    xticks(ax, 1:nBars)
+    xticklabels(ax, namesDiff_filtered)
+    xlim(ax, [0, nBars+1])
 
     % data labels above/below each bar, depending on sign
     xtips1 = statbar.XEndPoints;
     ytips1 = statbar.YEndPoints;
     labels1 = compose("%.2f", statbar.YData);
 
-    for i = 1:numel(typesdiff)
-        if typesdiff(i) >= 0
+    for i = 1:nBars
+        if typesdiff_filtered(i) >= 0
             vAlign = "bottom";
         else
             vAlign = "top";
@@ -122,10 +133,10 @@ for feat = s
 
     % "Therapist ... Client" direction label, outside the axes on the right
     yl = ylim(ax);
-    text(ax, 8.2, yl(2)/2, "Client", Rotation=90, ...
+    text(ax, nBars+1.2, yl(2)/2, "Client", Rotation=90, ...
         HorizontalAlignment="center", VerticalAlignment="middle", ...
         FontName="Times New Roman", Clipping="off")
-    text(ax, 8.2, yl(1)/2, "Therapist", Rotation=90, ...
+    text(ax, nBars+1.2, yl(1)/2, "Therapist", Rotation=90, ...
         HorizontalAlignment="center", VerticalAlignment="middle", ...
         FontName="Times New Roman", Clipping="off")
 
@@ -167,26 +178,30 @@ for feat = s
         exportgraphics(evoFig, fullfile(outdir, clno + "_iatypes_" + var + "_" + actor + "_evolution." + expformat), Resolution=600)
         close(evoFig)
 
-        % Distribution bar chart (single)
+        % Distribution pie chart (single)
         distFig = figure(Visible="off", Position=[10 10 lengthplot/3, heightplot/2]);
-        axDistSingle = axes(distFig);
+        axPieSingle = axes(distFig);
 
-        statbar = bar(axDistSingle, 1:7, typestotal.(actor).(var){1, :}, FaceColor="flat", CData=colorpalette, FaceAlpha=0.1);
-        axDistSingle.FontName = "Times New Roman";
-        ylabel(axDistSingle, "Decimal Percentage", FontAngle="normal")
-        ylim(axDistSingle, [0 (max(typestotal.(actor).(var){1, :})+0.1)])
-        xticks(axDistSingle, 1:7)
-        xlim(axDistSingle, [0, 8])
-        xticklabels(axDistSingle, iatypenames)
-        xtips1 = statbar.XEndPoints;
-        ytips1 = statbar.YEndPoints;
-         labels1 = compose("%.2f", statbar.YData);
-        text(axDistSingle, xtips1, ytips1, labels1, HorizontalAlignment="center", VerticalAlignment="bottom")
+        distributionSingle = typestotal.(actor).(var){1, :};
+        keepSingle = distributionSingle > 0;
+        distribution_filteredSingle = distributionSingle(keepSingle);
+        names_filteredSingle = iatypenames(keepSingle);
+        colors_filteredSingle = colorpalette(keepSingle, :);
+
+        labelsPieSingle = strcat(names_filteredSingle, " ", string(round(distribution_filteredSingle*100, 1)), "%");
+
+        p = pie(axPieSingle, distribution_filteredSingle, labelsPieSingle);
+        patches = p(1:2:end);
+        for k = 1:numel(patches)
+            patches(k).FaceColor = colors_filteredSingle(k, :);
+            patches(k).FaceAlpha = 0.3;
+        end
+        axPieSingle.FontName = "Times New Roman";
         switch actor
             case "c"
-                title(axDistSingle, "Client", FontAngle="normal")
+                title(axPieSingle, "Client", FontAngle="normal")
             case "t"
-                title(axDistSingle, "Therapist", FontAngle="normal")
+                title(axPieSingle, "Therapist", FontAngle="normal")
         end
 
         exportgraphics(distFig, fullfile(outdir, clno + "_iatypes_" + var + "_" + actor + "_distribution." + expformat), Resolution=600)
