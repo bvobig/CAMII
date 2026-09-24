@@ -37,6 +37,10 @@ for feat = s
         c = data.smoothed.(cdataname); % extract fitting data for c
         t = data.smoothed.(tdataname); % extract fitting data for t
 
+        % calculate lims
+        uplim = max([c; t])*1.1;
+        downlim = min([c; t])-(data.rangetotal.(feat)*0.1);
+
         % Evolution plot (combined)
         axEvo = nexttile(tlo, [1 2]);
         hold(axEvo, "on")
@@ -48,6 +52,8 @@ for feat = s
             plot(axEvo, time, t, "k-", DisplayName="Therapist")
         end
         hold(axEvo, "off")
+
+        ylim(axEvo, [downlim, uplim])
 
         plotInteractionRegions(axEvo, actor, var, types, iatypenames, colorpalette, time);
 
@@ -146,6 +152,14 @@ for feat = s
     %% Single Visualisations
     for actoridx = 1:2
         actor = ct(actoridx);
+        cdataname = datanames{datanameidx(feat)};   % extract Dataset names for indexing
+        tdataname = datanames{datanameidx(feat)+1}; % extract Dataset names for indexing
+        c = data.smoothed.(cdataname); % extract fitting data for c
+        t = data.smoothed.(tdataname); % extract fitting data for t
+
+        % calculate lims
+        uplim = max([c; t])*1.1;
+        downlim = min([c; t])-(data.rangetotal.(feat)*0.1);
 
         % Evolution plot (single)
         evoFig = figure(Visible="off", Position=[10 10 lengthplot (heightplot/2)]);
@@ -161,13 +175,17 @@ for feat = s
         end
         hold(axEvoSingle, "off")
 
+        ylim(axEvoSingle, [downlim, uplim])
+
         plotInteractionRegions(axEvoSingle, actor, var, types, iatypenames, colorpalette, time);
 
         axEvoSingle.FontName = "Times New Roman";
+        
         switch actor
             case "c"
                 title(axEvoSingle, "Client", FontAngle="normal")
                 ylabel(axEvoSingle, var, FontAngle="normal")
+                xlabel(axEvoSingle, "Time in Seconds (s)", FontAngle="normal")
             case "t"
                 title(axEvoSingle, "Therapist", FontAngle="normal")
                 ylabel(axEvoSingle, var, FontAngle="normal")
