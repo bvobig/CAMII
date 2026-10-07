@@ -194,7 +194,7 @@ for feat = s
                 ylabel(axEvoSingle, var, FontAngle="normal")
                 xlabel(axEvoSingle, "Time in Seconds (s)", FontAngle="normal")
         end
-        legend(axEvoSingle, Location="eastoutside", FontAngle="normal")
+        legend(axEvoSingle, Location="northeast", FontAngle="normal")
 
         exportgraphics(evoFig, fullfile(outdir, clno + "_iatypes_" + var + "_" + actor + "_evolution." + expformat), Resolution=600)
         close(evoFig)
