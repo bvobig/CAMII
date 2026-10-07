@@ -1,7 +1,7 @@
 function exportTypesFn(data, types, typestotal, s, clno, expformat, outdir)
 % Plot and export interaction-type figures per feature.
 
-set(0, 'DefaultFigureColor', 'white');
+set(groot, "defaultFigureColor", "white")
 
 time = data.impro.Time;
 varnames = ["AC", "Articulation", "Density", "Dissonance", "Duration", "Majorness", "MeanPitch", "MeanVelocity", "Minorness", "StandardPitchDeviation", "Tempo", "Tonality"];
@@ -27,6 +27,7 @@ for feat = s
     %% Combined Figure
 
     combinedFig = figure(Visible="off", Position=[10 10 lengthplot heightplot+200]);
+    theme(combinedFig, "light");
     tlo = tiledlayout(combinedFig, 2, 3, TileSpacing="compact");
 
     % Actor Loop
@@ -102,6 +103,7 @@ for feat = s
     typesdiff = typestotal.c.(var){1,:} - typestotal.t.(var){1,:}; % positive = client direction, negative = therapist direction
 
     diffFig = figure(Visible="off", Position=[10 10 lengthplot/3, heightplot/2]);
+    theme(diffFig, "light");
     ax = axes(diffFig);
 
     % filter out zero (or near-zero) categories
@@ -163,6 +165,7 @@ for feat = s
 
         % Evolution plot (single)
         evoFig = figure(Visible="off", Position=[10 10 lengthplot (heightplot/2)]);
+        theme(evoFig, "light");
         axEvoSingle = axes(evoFig);
 
         hold(axEvoSingle, "on")
@@ -198,6 +201,7 @@ for feat = s
 
         % Distribution pie chart (single)
         distFig = figure(Visible="off", Position=[10 10 lengthplot/3, heightplot/2]);
+        theme(distFig, "light");
         axPieSingle = axes(distFig);
 
         distributionSingle = typestotal.(actor).(var){1, :};

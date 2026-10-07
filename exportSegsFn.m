@@ -1,6 +1,8 @@
 function exportSegsFn(data, feats, s, clno, expformat, outdir)
 % Plot and export segments based on chosen segmentation and feature calculation.
 
+set(groot, "defaultFigureColor", "white")
+
 %% Prepare Data for Plotting and Define Plotting Variables
 feat_names = ["AC", "Articulation", "Density", "Dissonance", "Duration", "Majorness", "MeanPitch", "MeanVelocity", "Minorness", "StandardPitchDeviation", "Tempo", "Tonality"];
 
@@ -53,6 +55,7 @@ for t = s
 
         %% Plot Figure
         fig = figure(Position=[10 10 lengthplot heightplot], Visible="off");
+        theme(fig, "light");
         ax = axes(fig);
         hold(ax, "on")
         plot(ax, time, valuesc, "g", DisplayName="Client Smoothed")

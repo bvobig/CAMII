@@ -1,6 +1,7 @@
 function exportStatsFn(data, stats, s, clno, expformat, outdir)
 % Plot and export action-type statistics per actor/feature.
 
+set(groot, "defaultFigureColor", "white")
 
 %% Prepare Data for Plotting and Define Plotting Variables
 varnames = ["AC", "Articulation", "Density", "Dissonance", "Duration", "Majorness", "MeanPitch", "MeanVelocity", "Minorness", "StandardPitchDeviation", "Tempo", "Tonality"];
@@ -36,6 +37,7 @@ for actoridx = 1:2
         %% Combined Graphs
         % Level 1
         fig1 = figure(Visible="off", Position=[10 10 lengthplot heightplot], Color="w");
+        theme(fig1, "light");
         ax1 = axes(fig1);
         plot(ax1, data.impro.Time, stats.(act).(var).percenttable1{:, :})
         linestyleorder(ax1, ["-"; "--"; ":"])
@@ -51,6 +53,7 @@ for actoridx = 1:2
 
         % Level 2
         fig2 = figure(Visible="off", Position=[10 10 lengthplot heightplot], Color="w");
+        theme(fig2, "light");
         ax2 = axes(fig2);
         plot(ax2, data.impro.Time, stats.(act).(var).percenttable2{:, :})
         colororder(ax2, graphcolors2)
@@ -66,6 +69,7 @@ for actoridx = 1:2
 
         % Level 3
         fig3 = figure(Visible="off", Position=[10 10 lengthplot heightplot], Color="w");
+        theme(fig3, "light");
         ax3 = axes(fig3);
         plot(ax3, data.impro.Time, stats.(act).(var).percenttable3{:, :})
         colororder(ax3, graphcolors3)
@@ -81,6 +85,7 @@ for actoridx = 1:2
         %% Separated Graphs
         % Affirmative
         fig4 = figure(Visible="off", Position=[10 10 lengthplot heightplot], Color="w");
+        theme(fig4, "light");
         ax4 = axes(fig4);
         hold(ax4, "on")
         plot(ax4, data.impro.Time, stats.(act).(var).percenttable2{:,1}, Color=orange, DisplayName="A.I")
@@ -96,6 +101,7 @@ for actoridx = 1:2
 
         % Contradictive
         fig5 = figure(Visible="off", Position=[10 10 lengthplot heightplot], Color="w");
+        theme(fig5, "light");
         ax5 = axes(fig5);
         hold(ax5, "on")
         plot(ax5, data.impro.Time, stats.(act).(var).percenttable2{:,5}, Color=blue, DisplayName="C.I")
@@ -112,6 +118,7 @@ for actoridx = 1:2
 
         % Neutral
         fig6 = figure(Visible="off", Position=[10 10 lengthplot heightplot], Color="w");
+        theme(fig6, "light");
         ax6 = axes(fig6);
         hold(ax6, "on")
         plot(ax6, data.impro.Time, stats.(act).(var).percenttable2{:,3}, Color=black, DisplayName="N.I")
@@ -133,6 +140,7 @@ for actoridx = 1:2
                    stats.(act).(var).totalstats3{1, 3}, stats.(act).(var).totalstats2{1, 5}, stats.(act).(var).totalstats2{1, 6}];
 
         fig7 = figure(Visible="off", Color="w");
+        theme(fig7, "light");
         ax7 = axes(fig7);
         b = bar(ax7, bardata, FaceColor="flat");
         b(1).CData(1,:) = barcolors(1, :);

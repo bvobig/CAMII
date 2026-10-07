@@ -1,4 +1,7 @@
 function exportGraphsFn (data, segments, s, clno, expformat, outdir)
+% Plot and export MTTB-Curves and preprocessing/segmentation variants per actor/feature.
+
+set(groot, "defaultFigureColor", "white")
 
 feat_names=["AC", "Articulation", "Density", "Dissonance", "Duration", "Majorness", "MeanPitch", "MeanVelocity", "Minorness", "StandardPitchDeviation", "Tempo", "Tonality"];
 
@@ -53,7 +56,8 @@ featt = strcat(feat, "T");
 
 %Plot Raw Data
 
-    rawfig = figure(Visible = "off"); 
+    rawfig = figure(Visible = "off");
+    theme(rawfig, "light");
     rawfig_ax = axes(rawfig); 
 
     plot (rawfig_ax, time, client, "g", DisplayName="Client", LineWidth=lw)
@@ -77,6 +81,7 @@ featt = strcat(feat, "T");
 % Plot Smoothed Data
 
     smoothfig = figure(Visible = "off"); 
+    theme(smoothfig, "light");
     smoothfig_ax = axes(smoothfig); 
 
     plot (smoothfig_ax, time, csmoothed, "g", LineWidth=lw, DisplayName="Client Smoothed")
@@ -99,6 +104,7 @@ featt = strcat(feat, "T");
 % Plot Raw and Smoothed Data 
     
     rawsmoothfig = figure(Visible = "off");
+    theme(rawsmoothfig, "light");
     rawsmoothfig_ax = axes(rawsmoothfig); 
 
     plot(rawsmoothfig_ax, time, client, "g:", DisplayName="Client Raw", LineWidth=lw)
@@ -126,6 +132,7 @@ featt = strcat(feat, "T");
 % Client Segmentation
     
     cseg = figure(Visible = "off"); 
+    theme(cseg, "light");
     cseg_ax = axes(cseg);
 
     hold(cseg_ax, "on")
@@ -150,6 +157,7 @@ featt = strcat(feat, "T");
 % Therapist Segmentation
 
     tseg = figure(Visible = "off");
+    theme(tseg, "light");
     tseg_ax = axes(tseg);
 
     hold(tseg_ax, "on")
@@ -175,6 +183,7 @@ featt = strcat(feat, "T");
 % Combined (including crossings)
 
     combinedfig = figure(Visible = "off"); 
+    theme(combinedfig, "light");
     combinedfig_ax = axes(combinedfig);
 
     hold(combinedfig_ax, "on") 
