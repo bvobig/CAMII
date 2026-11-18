@@ -4,11 +4,13 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20338644.svg)](https://doi.org/10.5281/zenodo.20338644)
 
+[![Latest Release and Installer](https://img.shields.io/github/v/release/bvobig/camii)](https://github.com/bvobig/camii/releases/latest)
+
 CAMII is a MATLAB-based analysis framework developed from the theoretical model presented in Vobig (2025).
 
 The software analyses dyadic piano improvisations provided as MIDI files containing two performer channels. The data are preprocessed using a modified version of the Music Therapy Toolbox (MTTB), after which a supervised machine learning classifier and a manually defined decision tree are applied to identify and classify interaction patterns throughout the improvisation.
 
-The interaction analysis is based on the concepts of **Relational Direction** and **Relational Proximity**.
+The interaction analysis is based on the concepts of **Relational Direction** and **Proximity**.
 
 Optional export settings allow the generation of graphical and statistical representations in various formats.
 
@@ -47,8 +49,8 @@ CAMII requires:
 
 * MIDI file (`.mid`)
 * Exactly two MIDI channels representing the two performers
-* Channel 1: Client
-* Channel 2: Therapist
+* Channel 7: Client
+* Channel 8: Therapist
 
 ---
 
