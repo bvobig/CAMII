@@ -4,7 +4,7 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20338644.svg)](https://doi.org/10.5281/zenodo.20338644)
 
-[![Latest Release and Installer](https://img.shields.io/github/v/release/bvobig/camii)](https://github.com/bvobig/camii/releases/latest)
+[![Latest Release](https://img.shields.io/github/v/release/bvobig/camii?include_prereleases)](https://github.com/bvobig/camii/releases)
 
 CAMII is a MATLAB-based analysis framework developed from the theoretical model presented in Vobig (2025).
 
